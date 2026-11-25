@@ -12,6 +12,11 @@
     <RootNamespace>DeskLauncher</RootNamespace>
     <NoWarn>$(NoWarn);WPF0001</NoWarn>
     <ApplicationIcon>Assets\appicon.ico</ApplicationIcon>
+    <Version>0.1.0-beta</Version>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <FileVersion>0.1.0.0</FileVersion>
+    <Product>DeskLauncher</Product>
+    <Company>OpenWebDevelopers</Company>
   </PropertyGroup>
 
   <ItemGroup>
