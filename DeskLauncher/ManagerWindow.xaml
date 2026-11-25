@@ -1,0 +1,361 @@
+<Window x:Class="DeskLauncher.ManagerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:DeskLauncher"
+        Title="DeskLauncher Manager" Width="1020" Height="740" MinWidth="900" MinHeight="620"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource WindowBg}"
+        FontFamily="{StaticResource UiFont}" FontSize="14"
+        TextOptions.TextFormattingMode="Ideal" UseLayoutRounding="True">
+    <Window.Resources>
+        <local:ShortcutIconConverter x:Key="ShortcutIcon"/>
+        <local:FolderIconConverter x:Key="FolderIcon"/>
+        <BooleanToVisibilityConverter x:Key="B2V"/>
+        <!-- Toggled from code-behind: Collapsed makes every button icon-only (narrow window). -->
+        <Visibility x:Key="LabelVis">Visible</Visibility>
+        <Style x:Key="BtnLabel" TargetType="TextBlock">
+            <Setter Property="Margin" Value="8,0,0,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Visibility" Value="{DynamicResource LabelVis}"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="230"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar -->
+        <Border Background="{StaticResource SidebarBg}">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Top" Margin="20,22,20,18">
+                    <TextBlock Text="DeskLauncher" FontFamily="{StaticResource UiDisplayFont}"
+                               FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+                    <TextBlock Text="Manager" Style="{StaticResource Caption}"/>
+                </StackPanel>
+
+                <Border DockPanel.Dock="Bottom" Style="{StaticResource Card}" Margin="10" Padding="12,10">
+                    <StackPanel>
+                        <TextBlock x:Name="ActiveProfileText" Foreground="{StaticResource TextPrimary}" FontSize="12"
+                                   FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Text="Perfil activo" Style="{StaticResource Caption}"/>
+                    </StackPanel>
+                </Border>
+
+                <StackPanel>
+                    <TextBlock Text="NAVEGACIÓN" Style="{StaticResource Caption}" Margin="20,0,0,8"/>
+                    <RadioButton x:Name="NavFolders" Style="{StaticResource NavItem}" GroupName="nav" IsChecked="True"
+                                 Checked="Nav_Checked">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE8B7;" Style="{StaticResource Glyph}" Margin="0,0,12,0"/>
+                            <TextBlock Text="Carpetas y apps"/>
+                        </StackPanel>
+                    </RadioButton>
+                    <RadioButton x:Name="NavProfiles" Style="{StaticResource NavItem}" GroupName="nav" Checked="Nav_Checked">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE77B;" Style="{StaticResource Glyph}" Margin="0,0,12,0"/>
+                            <TextBlock Text="Perfiles"/>
+                        </StackPanel>
+                    </RadioButton>
+                    <RadioButton x:Name="NavSettings" Style="{StaticResource NavItem}" GroupName="nav" Checked="Nav_Checked">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE713;" Style="{StaticResource Glyph}" Margin="0,0,12,0"/>
+                            <TextBlock Text="Configuración"/>
+                        </StackPanel>
+                    </RadioButton>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Content -->
+        <Grid Grid.Column="1" Margin="28,14,28,24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <!-- App logo, top-right on every Manager page -->
+            <Image Grid.Row="0" Grid.RowSpan="2" Source="pack://application:,,,/Assets/logo.png" Width="128" Height="128" VerticalAlignment="Top" IsHitTestVisible="False"
+                   HorizontalAlignment="Right" ToolTip="DeskLauncher"
+                   RenderOptions.BitmapScalingMode="HighQuality"/>
+
+            <!-- Page: folders + apps -->
+            <Grid x:Name="PageFolders" Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <DockPanel Margin="0,0,144,18" MinHeight="112">
+                    <StackPanel>
+                        <TextBlock Text="Carpetas y apps" Style="{StaticResource PageTitle}"/>
+                        <TextBlock Text="Organiza las carpetas del escritorio y las apps que contiene."
+                                   Foreground="{StaticResource TextSecondary}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </DockPanel>
+
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="280"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Folder list -->
+                    <Border Style="{StaticResource Card}">
+                        <DockPanel>
+                            <DockPanel DockPanel.Dock="Top" Margin="4,0,0,10">
+                                <Button DockPanel.Dock="Right" Style="{StaticResource AccentButton}" Padding="9,6"
+                                        Click="AddFolder_Click" ToolTip="Nueva carpeta">
+                                    <TextBlock Text="&#xE710;" Style="{StaticResource Glyph}" FontSize="13"/>
+                                </Button>
+                                <TextBlock Text="CARPETAS" Style="{StaticResource SectionLabel}" VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <Button x:Name="DeleteFolderBtn" DockPanel.Dock="Bottom" Margin="0,10,0,0"
+                                    HorizontalAlignment="Stretch" IsEnabled="False"
+                                    Click="DeleteFolder_Click" ToolTip="Eliminar carpeta seleccionada">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <TextBlock Text="&#xE74D;" Style="{StaticResource DangerGlyph}" FontSize="13"/>
+                                    <TextBlock Text="Eliminar carpeta" Style="{StaticResource DangerText}"/>
+                                </StackPanel>
+                            </Button>
+                            <ListBox x:Name="FolderList" Background="Transparent" BorderThickness="0"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                     ItemContainerStyle="{StaticResource RowItem}" SelectionChanged="Folder_Changed">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Grid Width="36" Height="36" Margin="0,0,12,0">
+                                                <Border Background="{StaticResource TileBg}" CornerRadius="8"/>
+                                                <TextBlock Text="&#xE8B7;" Style="{StaticResource Glyph}" FontSize="18"
+                                                           Foreground="{StaticResource Accent}"/>
+                                                <Image Margin="4" Source="{Binding Converter={StaticResource FolderIcon}}"/>
+                                            </Grid>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Style="{StaticResource Caption}">
+                                                    <Run Text="{Binding Shortcuts.Count, Mode=OneWay}"/><Run Text=" accesos"/>
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </DockPanel>
+                    </Border>
+
+                    <!-- Folder detail -->
+                    <Border x:Name="DetailCard" Grid.Column="2" Style="{StaticResource Card}" SizeChanged="DetailCard_SizeChanged">
+                        <DockPanel>
+                            <Grid DockPanel.Dock="Top" Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Width="52" Height="52" CornerRadius="10" Background="{StaticResource TileBg}" Margin="0,0,14,0">
+                                    <Grid>
+                                        <TextBlock Text="&#xE8B7;" Style="{StaticResource Glyph}" FontSize="24"
+                                                   Foreground="{StaticResource Accent}"/>
+                                        <Image x:Name="FolderIconPreview" Margin="6"/>
+                                    </Grid>
+                                </Border>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="NOMBRE DE LA CARPETA" Style="{StaticResource Caption}" Margin="0,0,0,4"/>
+                                    <TextBox x:Name="NameBox" LostFocus="Name_LostFocus"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Bottom" Margin="12,0,0,0">
+                                    <Button Click="FolderIcon_Click" ToolTip="Cambiar icono">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="&#xEB9F;" Style="{StaticResource Glyph}" FontSize="14"/>
+                                            <TextBlock Text="Cambiar icono" Style="{StaticResource BtnLabel}"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Margin="8,0,0,0" Click="FolderIconReset_Click" ToolTip="Restablecer icono">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="&#xE777;" Style="{StaticResource Glyph}" FontSize="14"/>
+                                            <TextBlock Text="Restablecer" Style="{StaticResource BtnLabel}"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+
+                            <DockPanel DockPanel.Dock="Top" Margin="4,0,0,16">
+                                <ComboBox x:Name="PanelStyleBox" DockPanel.Dock="Right" Width="150"
+                                          SelectionChanged="PanelStyle_Changed">
+                                    <ComboBoxItem Tag="Arc" Content="Arco"/>
+                                    <ComboBoxItem Tag="Ring" Content="Anillo"/>
+                                    <ComboBoxItem Tag="Phone" Content="Phone App"/>
+                                </ComboBox>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="Estilo de accesos" FontWeight="SemiBold"/>
+                                    <TextBlock Text="Cómo se muestran las apps de esta carpeta."
+                                               Style="{StaticResource Caption}" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+                            </DockPanel>
+
+                            <DockPanel DockPanel.Dock="Top" Margin="4,0,0,8">
+                                <TextBlock Text="APLICACIONES VINCULADAS" Style="{StaticResource SectionLabel}"
+                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                            </DockPanel>
+
+                            <WrapPanel DockPanel.Dock="Bottom" Margin="0,12,0,0">
+                                <Button Click="AddApp_Click" Margin="0,0,8,6" ToolTip="Agregar app…">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE710;" Style="{StaticResource Glyph}" FontSize="13"/>
+                                        <TextBlock Text="Agregar app…" Style="{StaticResource BtnLabel}"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button x:Name="AppIconBtn" Click="AppIcon_Click" Margin="0,0,8,6" IsEnabled="False"
+                                        ToolTip="Cambiar icono de la app seleccionada">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xEB9F;" Style="{StaticResource ActionGlyph}" FontSize="14"/>
+                                        <TextBlock Text="Icono de app" Style="{StaticResource BtnLabel}"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button x:Name="AppResetBtn" Click="AppIconReset_Click" Margin="0,0,8,6" IsEnabled="False"
+                                        ToolTip="Restablecer icono de la app seleccionada">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE777;" Style="{StaticResource ActionGlyph}" FontSize="14"/>
+                                        <TextBlock Text="Restablecer" Style="{StaticResource BtnLabel}"/>
+                                    </StackPanel>
+                                </Button>
+                            </WrapPanel>
+
+                            <ListBox x:Name="AppList" Background="Transparent" BorderThickness="0"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                     ItemContainerStyle="{StaticResource RowItem}" AllowDrop="True"
+                                     SelectionChanged="AppList_SelectionChanged"
+                                     PreviewMouseLeftButtonDown="AppList_PreviewMouseDown"
+                                     PreviewMouseMove="AppList_PreviewMouseMove"
+                                     DragOver="AppList_DragOver" Drop="AppList_Drop">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border Tag="grip" Width="24" Margin="0,0,6,0" Background="Transparent"
+                                                    Cursor="SizeAll" ToolTip="Arrastra para cambiar el orden">
+                                                <TextBlock Text="&#xE76F;" Style="{StaticResource Glyph}"
+                                                           Foreground="{StaticResource TextSecondary}"/>
+                                            </Border>
+                                            <Border Grid.Column="1" Width="40" Height="40" CornerRadius="8" Background="{StaticResource TileBg}" Margin="0,0,12,0">
+                                                <Image Margin="6" Source="{Binding Converter={StaticResource ShortcutIcon}}"/>
+                                            </Border>
+                                            <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding TargetPath}" Style="{StaticResource Caption}"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                            </StackPanel>
+                                            <Button Grid.Column="3" Margin="8,0,0,0" Padding="9,7" VerticalAlignment="Center"
+                                                    ToolTip="Quitar de la carpeta" Click="DeleteApp_Click">
+                                                <TextBlock Text="&#xE74D;" Style="{StaticResource RowDeleteGlyph}" FontSize="13"/>
+                                            </Button>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </DockPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+
+            <!-- Page: profiles -->
+            <Grid x:Name="PageProfiles" Grid.Row="1" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <DockPanel Margin="0,0,144,18" MinHeight="112">
+                    <Button DockPanel.Dock="Right" Style="{StaticResource AccentButton}" VerticalAlignment="Top"
+                            Click="AddProfile_Click" ToolTip="Nuevo perfil">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE710;" Style="{StaticResource Glyph}" FontSize="13"/>
+                            <TextBlock Text="Nuevo perfil" Style="{StaticResource BtnLabel}"/>
+                        </StackPanel>
+                    </Button>
+                    <StackPanel>
+                        <TextBlock Text="Perfiles" Style="{StaticResource PageTitle}"/>
+                        <TextBlock Text="Cambia el conjunto de carpetas visibles en el escritorio."
+                                   Foreground="{StaticResource TextSecondary}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </DockPanel>
+                <Border Grid.Row="1" Style="{StaticResource Card}" MaxWidth="560" HorizontalAlignment="Left">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top" Text="PERFILES DISPONIBLES" Style="{StaticResource SectionLabel}" Margin="4,0,0,10"/>
+                        <ListBox x:Name="ProfileList" Background="Transparent" BorderThickness="0"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ItemContainerStyle="{StaticResource RowItem}" SelectionChanged="Profile_Changed">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Border Width="36" Height="36" CornerRadius="8" Background="{StaticResource TileBg}" Margin="0,0,12,0">
+                                            <TextBlock Text="&#xE77B;" Style="{StaticResource Glyph}" Foreground="{StaticResource Accent}"/>
+                                        </Border>
+                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </DockPanel>
+                </Border>
+            </Grid>
+
+            <!-- Page: settings -->
+            <Grid x:Name="PageSettings" Grid.Row="1" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <StackPanel Margin="0,0,144,18" MinHeight="112">
+                    <TextBlock Text="Configuración" Style="{StaticResource PageTitle}"/>
+                    <TextBlock Text="Preferencias generales de DeskLauncher."
+                               Foreground="{StaticResource TextSecondary}" Margin="0,4,0,0"/>
+                </StackPanel>
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                        <StackPanel>
+                            <DockPanel Margin="0,0,0,14">
+                                <ComboBox x:Name="ThemeBox" DockPanel.Dock="Right" Width="150"
+                                          SelectionChanged="Theme_Changed">
+                                    <ComboBoxItem Tag="System" Content="Sistema"/>
+                                    <ComboBoxItem Tag="Light" Content="Claro"/>
+                                    <ComboBoxItem Tag="Dark" Content="Oscuro"/>
+                                </ComboBox>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="Apariencia" FontWeight="SemiBold"/>
+                                    <TextBlock Text="Sistema sigue el modo claro/oscuro de Windows."
+                                               Style="{StaticResource Caption}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </DockPanel>
+                            <CheckBox x:Name="AutoStartBox" Content="Iniciar automáticamente con Windows" Click="AutoStart_Click"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Row="1" Style="{StaticResource Card}" VerticalAlignment="Top">
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" VerticalAlignment="Center" Click="OpenLibrary_Click"
+                                    ToolTip="Abrir biblioteca">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xEB9F;" Style="{StaticResource Glyph}" FontSize="14"/>
+                                    <TextBlock Text="Abrir biblioteca" Style="{StaticResource BtnLabel}"/>
+                                </StackPanel>
+                            </Button>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Biblioteca de iconos" FontWeight="SemiBold"/>
+                                <TextBlock x:Name="LibraryCountText" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </DockPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
