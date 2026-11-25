@@ -5,6 +5,17 @@ Lanzador de accesos para el escritorio de Windows. Coloca carpetas flotantes sob
 - Plataforma: Windows 10/11
 - Stack: .NET 10, WPF (con Windows Forms para bandeja y pantallas)
 
+## Descarga
+
+Última versión: **[0.1.0-beta](https://github.com/openwebdevelopers/desk-launcher-windows/releases/tag/v0.1.0-beta)** (pre-release).
+
+| Archivo | Descripción |
+|---|---|
+| [`DeskLauncher-0.1.0-beta-win-x64.zip`](https://github.com/openwebdevelopers/desk-launcher-windows/releases/download/v0.1.0-beta/DeskLauncher-0.1.0-beta-win-x64.zip) | Recomendado. Un solo `.exe`, no requiere instalar nada: descomprime y ejecuta. |
+| [`DeskLauncher-0.1.0-beta-win-x64-requiere-dotnet10.zip`](https://github.com/openwebdevelopers/desk-launcher-windows/releases/download/v0.1.0-beta/DeskLauncher-0.1.0-beta-win-x64-requiere-dotnet10.zip) | Versión liviana (0,3 MB); requiere el [runtime .NET 10 Desktop](https://dotnet.microsoft.com/download/dotnet/10.0). |
+
+Windows 10/11 de 64 bits. El ejecutable no está firmado, por lo que SmartScreen puede mostrar una advertencia. Todas las versiones están en [Releases](https://github.com/openwebdevelopers/desk-launcher-windows/releases).
+
 ## Capturas
 
 ### Launchers en el escritorio
