@@ -16,7 +16,9 @@ public static class AppState
 
     public static void Init()
     {
-        var root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DeskLauncher");
+        // DESKLAUNCHER_DATA overrides the data folder (demos, screenshots, tests).
+        var root = Environment.GetEnvironmentVariable("DESKLAUNCHER_DATA")
+                   ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DeskLauncher");
         Store = new ConfigStore(root);
         Icons = new IconManager(Store.IconCacheDir, Store.CustomIconDir);
         Global = Store.LoadGlobal();

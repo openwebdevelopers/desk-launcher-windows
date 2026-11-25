@@ -4,7 +4,7 @@
         xmlns:local="clr-namespace:DeskLauncher"
         Title="Elegir icono" Width="560" Height="580" MinWidth="460" MinHeight="480"
         ShowInTaskbar="False" ResizeMode="CanResizeWithGrip"
-        Background="{StaticResource WindowBg}"
+        Background="{DynamicResource WindowBg}"
         FontFamily="{StaticResource UiFont}" FontSize="14" UseLayoutRounding="True">
     <Grid Margin="16">
         <Grid.RowDefinitions>
@@ -18,7 +18,7 @@
             <StackPanel>
             <TextBlock Text="Biblioteca de iconos" FontFamily="{StaticResource UiDisplayFont}" FontSize="20"
                        FontWeight="SemiBold"/>
-            <TextBlock Text="Elige un icono o agrega uno nuevo." Foreground="{StaticResource TextSecondary}" Margin="0,2,0,0"/>
+            <TextBlock Text="Elige un icono o agrega uno nuevo." Foreground="{DynamicResource TextSecondary}" Margin="0,2,0,0"/>
             </StackPanel>
         </DockPanel>
         <Border Grid.Row="1" Style="{StaticResource Card}" Padding="12">

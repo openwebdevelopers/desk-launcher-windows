@@ -5,6 +5,26 @@ Lanzador de accesos para el escritorio de Windows. Coloca carpetas flotantes sob
 - Plataforma: Windows 10/11
 - Stack: .NET 10, WPF (con Windows Forms para bandeja y pantallas)
 
+## Capturas
+
+### Launchers en el escritorio
+
+Cada carpeta tiene su propio estilo de accesos.
+
+| Arco | Anillo | Phone App |
+|---|---|---|
+| ![Estilo Arco](docs/screenshots/launcher-arco.png) | ![Estilo Anillo](docs/screenshots/launcher-anillo.png) | ![Estilo Phone App](docs/screenshots/launcher-phone.png) |
+
+### Manager
+
+![Manager: carpetas y apps (tema oscuro)](docs/screenshots/manager-carpetas.png)
+
+| Perfiles | Configuración | Tema claro |
+|---|---|---|
+| ![Perfiles](docs/screenshots/manager-perfiles.png) | ![Configuración](docs/screenshots/manager-configuracion.png) | ![Tema claro](docs/screenshots/manager-claro.png) |
+
+Las capturas usan una configuración de demostración (carpetas y apps genéricas de Windows), ver [Capturas de pantalla](#capturas-de-pantalla-1).
+
 ## Funciones
 
 - **Carpetas en el escritorio**: se arrastran para moverlas, recuerdan su posición por monitor y se ubican justo encima del escritorio, por debajo de las ventanas normales.
@@ -34,6 +54,19 @@ cd DeskLauncher
 dotnet build
 .\bin\Debug\net10.0-windows\DeskLauncher.exe
 ```
+
+## Opciones de arranque
+
+- `--manager`: abre el Manager al terminar la pantalla de carga.
+- Variable de entorno `DESKLAUNCHER_DATA`: usa otra carpeta de datos en lugar de `%APPDATA%\DeskLauncher\` (útil para demos, pruebas y capturas).
+
+## Capturas de pantalla
+
+Para regenerar las capturas sin tocar tus datos:
+
+1. Crea una carpeta con un `global.json` y un `profiles\<id>\config.json` de demostración (carpetas con estilos `Arc`, `Ring` y `Phone`, y `CollapseOnMouseLeave` en `false`).
+2. Cierra DeskLauncher y ejecútalo con `DESKLAUNCHER_DATA` apuntando a esa carpeta (más `--manager` para el Manager).
+3. Captura las ventanas y guarda los PNG en `docs/screenshots/`.
 
 ## Datos de usuario
 

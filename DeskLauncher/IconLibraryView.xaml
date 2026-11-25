@@ -29,7 +29,7 @@
                 </ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border Width="64" Height="64" CornerRadius="8" Background="{StaticResource TileBg}" Margin="2">
+                        <Border Width="64" Height="64" CornerRadius="8" Background="{DynamicResource TileBg}" Margin="2">
                             <Image Margin="8" Source="{Binding Image}" RenderOptions.BitmapScalingMode="HighQuality"/>
                         </Border>
                     </DataTemplate>

@@ -4,7 +4,7 @@
         xmlns:local="clr-namespace:DeskLauncher"
         Title="DeskLauncher Manager" Width="1020" Height="740" MinWidth="900" MinHeight="620"
         WindowStartupLocation="CenterScreen"
-        Background="{StaticResource WindowBg}"
+        Background="{DynamicResource WindowBg}"
         FontFamily="{StaticResource UiFont}" FontSize="14"
         TextOptions.TextFormattingMode="Ideal" UseLayoutRounding="True">
     <Window.Resources>
@@ -27,17 +27,17 @@
         </Grid.ColumnDefinitions>
 
         <!-- Sidebar -->
-        <Border Background="{StaticResource SidebarBg}">
+        <Border Background="{DynamicResource SidebarBg}">
             <DockPanel>
                 <StackPanel DockPanel.Dock="Top" Margin="20,22,20,18">
                     <TextBlock Text="DeskLauncher" FontFamily="{StaticResource UiDisplayFont}"
-                               FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+                               FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
                     <TextBlock Text="Manager" Style="{StaticResource Caption}"/>
                 </StackPanel>
 
                 <Border DockPanel.Dock="Bottom" Style="{StaticResource Card}" Margin="10" Padding="12,10">
                     <StackPanel>
-                        <TextBlock x:Name="ActiveProfileText" Foreground="{StaticResource TextPrimary}" FontSize="12"
+                        <TextBlock x:Name="ActiveProfileText" Foreground="{DynamicResource TextPrimary}" FontSize="12"
                                    FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
                         <TextBlock Text="Perfil activo" Style="{StaticResource Caption}"/>
                     </StackPanel>
@@ -90,7 +90,7 @@
                     <StackPanel>
                         <TextBlock Text="Carpetas y apps" Style="{StaticResource PageTitle}"/>
                         <TextBlock Text="Organiza las carpetas del escritorio y las apps que contiene."
-                                   Foreground="{StaticResource TextSecondary}" Margin="0,4,0,0"/>
+                                   Foreground="{DynamicResource TextSecondary}" Margin="0,4,0,0"/>
                     </StackPanel>
                 </DockPanel>
 
@@ -126,9 +126,9 @@
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
                                             <Grid Width="36" Height="36" Margin="0,0,12,0">
-                                                <Border Background="{StaticResource TileBg}" CornerRadius="8"/>
+                                                <Border Background="{DynamicResource TileBg}" CornerRadius="8"/>
                                                 <TextBlock Text="&#xE8B7;" Style="{StaticResource Glyph}" FontSize="18"
-                                                           Foreground="{StaticResource Accent}"/>
+                                                           Foreground="{DynamicResource Accent}"/>
                                                 <Image Margin="4" Source="{Binding Converter={StaticResource FolderIcon}}"/>
                                             </Grid>
                                             <StackPanel VerticalAlignment="Center">
@@ -153,10 +153,10 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <Border Width="52" Height="52" CornerRadius="10" Background="{StaticResource TileBg}" Margin="0,0,14,0">
+                                <Border Width="52" Height="52" CornerRadius="10" Background="{DynamicResource TileBg}" Margin="0,0,14,0">
                                     <Grid>
                                         <TextBlock Text="&#xE8B7;" Style="{StaticResource Glyph}" FontSize="24"
-                                                   Foreground="{StaticResource Accent}"/>
+                                                   Foreground="{DynamicResource Accent}"/>
                                         <Image x:Name="FolderIconPreview" Margin="6"/>
                                     </Grid>
                                 </Border>
@@ -241,9 +241,9 @@
                                             <Border Tag="grip" Width="24" Margin="0,0,6,0" Background="Transparent"
                                                     Cursor="SizeAll" ToolTip="Arrastra para cambiar el orden">
                                                 <TextBlock Text="&#xE76F;" Style="{StaticResource Glyph}"
-                                                           Foreground="{StaticResource TextSecondary}"/>
+                                                           Foreground="{DynamicResource TextSecondary}"/>
                                             </Border>
-                                            <Border Grid.Column="1" Width="40" Height="40" CornerRadius="8" Background="{StaticResource TileBg}" Margin="0,0,12,0">
+                                            <Border Grid.Column="1" Width="40" Height="40" CornerRadius="8" Background="{DynamicResource TileBg}" Margin="0,0,12,0">
                                                 <Image Margin="6" Source="{Binding Converter={StaticResource ShortcutIcon}}"/>
                                             </Border>
                                             <StackPanel Grid.Column="2" VerticalAlignment="Center">
@@ -275,16 +275,16 @@
                             Click="AddProfile_Click" ToolTip="Nuevo perfil">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="&#xE710;" Style="{StaticResource Glyph}" FontSize="13"/>
-                            <TextBlock Text="Nuevo perfil" Style="{StaticResource BtnLabel}"/>
+                            <TextBlock Text="Nuevo perfil" Margin="8,0,0,0"/>
                         </StackPanel>
                     </Button>
                     <StackPanel>
                         <TextBlock Text="Perfiles" Style="{StaticResource PageTitle}"/>
                         <TextBlock Text="Cambia el conjunto de carpetas visibles en el escritorio."
-                                   Foreground="{StaticResource TextSecondary}" Margin="0,4,0,0"/>
+                                   Foreground="{DynamicResource TextSecondary}" Margin="0,4,0,0"/>
                     </StackPanel>
                 </DockPanel>
-                <Border Grid.Row="1" Style="{StaticResource Card}" MaxWidth="560" HorizontalAlignment="Left">
+                <Border Grid.Row="1" Style="{StaticResource Card}" MinWidth="460" MaxWidth="560" HorizontalAlignment="Left">
                     <DockPanel>
                         <TextBlock DockPanel.Dock="Top" Text="PERFILES DISPONIBLES" Style="{StaticResource SectionLabel}" Margin="4,0,0,10"/>
                         <ListBox x:Name="ProfileList" Background="Transparent" BorderThickness="0"
@@ -293,8 +293,8 @@
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <Border Width="36" Height="36" CornerRadius="8" Background="{StaticResource TileBg}" Margin="0,0,12,0">
-                                            <TextBlock Text="&#xE77B;" Style="{StaticResource Glyph}" Foreground="{StaticResource Accent}"/>
+                                        <Border Width="36" Height="36" CornerRadius="8" Background="{DynamicResource TileBg}" Margin="0,0,12,0">
+                                            <TextBlock Text="&#xE77B;" Style="{StaticResource Glyph}" Foreground="{DynamicResource Accent}"/>
                                         </Border>
                                         <TextBlock Text="{Binding Name}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                                     </StackPanel>
@@ -314,7 +314,7 @@
                 <StackPanel Margin="0,0,144,18" MinHeight="112">
                     <TextBlock Text="Configuración" Style="{StaticResource PageTitle}"/>
                     <TextBlock Text="Preferencias generales de DeskLauncher."
-                               Foreground="{StaticResource TextSecondary}" Margin="0,4,0,0"/>
+                               Foreground="{DynamicResource TextSecondary}" Margin="0,4,0,0"/>
                 </StackPanel>
                 <Grid Grid.Row="1">
                     <Grid.RowDefinitions>
@@ -345,7 +345,7 @@
                                     ToolTip="Abrir biblioteca">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xEB9F;" Style="{StaticResource Glyph}" FontSize="14"/>
-                                    <TextBlock Text="Abrir biblioteca" Style="{StaticResource BtnLabel}"/>
+                                    <TextBlock Text="Abrir biblioteca" Margin="8,0,0,0"/>
                                 </StackPanel>
                             </Button>
                             <StackPanel VerticalAlignment="Center">

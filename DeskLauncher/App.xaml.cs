@@ -24,7 +24,8 @@ public partial class App : Application
         EventManager.RegisterClassHandler(typeof(Window), FrameworkElement.LoadedEvent,
             new RoutedEventHandler((s, _) => { if (s is Window w && w.Icon == null) w.Icon = icon; }));
 
-        SplashWindow.Run();
+        // --manager: open the Manager when the startup splash ends.
+        SplashWindow.Run(e.Args.Contains("--manager") ? ManagerWindow.ShowSingleton : null);
         AppState.Init();
         ThemeService.Apply();
         AppState.Rebuild += BuildDocks;
@@ -33,6 +34,7 @@ public partial class App : Application
         BuildDocks();
         BuildTray();
         AutoStartService.Set(AppState.Global.StartOnLogin);
+
     }
 
     void BuildDocks()

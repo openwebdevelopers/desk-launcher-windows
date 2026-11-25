@@ -211,6 +211,7 @@ public partial class ManagerWindow : Window
 
     void DetailCard_SizeChanged(object sender, SizeChangedEventArgs e)
     {
+        if (e.NewSize.Width <= 0) return; // page hidden
         bool compact = e.NewSize.Width < CompactWidth;
         if (compact == _compact) return;
         _compact = compact;
