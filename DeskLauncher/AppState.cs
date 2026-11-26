@@ -23,6 +23,8 @@ public static class AppState
         Icons = new IconManager(Store.IconCacheDir, Store.CustomIconDir);
         Global = Store.LoadGlobal();
 
+        // A tampered global.json must not smuggle path fragments in as profile ids.
+        Global.Profiles.RemoveAll(p => !ConfigStore.IsValidProfileId(p.Id));
         if (Global.Profiles.Count == 0)
             Global.Profiles.Add(new Profile { Name = "Default" });
         if (Global.Profiles.All(p => p.Id != Global.ActiveProfileId))

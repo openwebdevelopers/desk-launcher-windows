@@ -35,6 +35,8 @@ public sealed class IconManager
 
     const int SIIGBF_ICONONLY = 0x4;
     const int Size = 96;
+    const long MaxImageBytes = 25 * 1024 * 1024;
+    const long MaxImagePixels = 64L * 1024 * 1024; // ~8k x 8k
 
     static readonly string[] ImageExts = { ".png", ".jpg", ".jpeg", ".bmp", ".ico", ".gif" };
     static readonly string[] ShellExts = { ".exe", ".dll", ".lnk" };
@@ -177,9 +179,10 @@ public sealed class IconManager
     static BitmapSource? DecodeImage(string file)
     {
         using var fs = File.OpenRead(file);
+        if (fs.Length > MaxImageBytes) return null; // refuse oversized files before decoding
         var decoder = BitmapDecoder.Create(fs, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
-        var frame = decoder.Frames.OrderByDescending(f => f.PixelWidth * f.PixelHeight).FirstOrDefault();
-        if (frame == null) return null;
+        var frame = decoder.Frames.OrderByDescending(f => (long)f.PixelWidth * f.PixelHeight).FirstOrDefault();
+        if (frame == null || (long)frame.PixelWidth * frame.PixelHeight > MaxImagePixels) return null; // decompression-bomb guard
 
         BitmapSource src = frame;
         int max = Math.Max(src.PixelWidth, src.PixelHeight);

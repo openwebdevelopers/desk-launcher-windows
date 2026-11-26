@@ -23,7 +23,19 @@ public sealed class ConfigStore
     public string IconCacheDir => Path.Combine(Root, "iconcache");
     public string CustomIconDir => Path.Combine(Root, "icons");
     string GlobalPath => Path.Combine(Root, "global.json");
-    string ProfilePath(string id) => Path.Combine(Root, "profiles", id, "config.json");
+    string ProfilePath(string id) => Path.Combine(ProfileDir(id), "config.json");
+
+    /// <summary>
+    /// Profile ids come from global.json (user-writable), so they are never trusted as paths:
+    /// only GUIDs are accepted, which rules out "..\" traversal before any read, write or delete.
+    /// </summary>
+    string ProfileDir(string id)
+    {
+        if (!IsValidProfileId(id)) throw new ArgumentException("Invalid profile id.", nameof(id));
+        return Path.Combine(Root, "profiles", Guid.Parse(id).ToString());
+    }
+
+    public static bool IsValidProfileId(string? id) => Guid.TryParse(id, out _);
 
     public GlobalConfig LoadGlobal() => Load<GlobalConfig>(GlobalPath);
     public void SaveGlobal(GlobalConfig c) => Save(GlobalPath, c);
@@ -33,7 +45,7 @@ public sealed class ConfigStore
 
     public void DeleteProfile(string id)
     {
-        try { Directory.Delete(Path.GetDirectoryName(ProfilePath(id))!, true); }
+        try { Directory.Delete(ProfileDir(id), true); }
         catch (IOException) { }
     }
 
