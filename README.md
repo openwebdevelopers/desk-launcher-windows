@@ -7,12 +7,12 @@ Lanzador de accesos para el escritorio de Windows. Coloca carpetas flotantes sob
 
 ## Descarga
 
-Última versión: **[0.2.0-beta](https://github.com/openwebdevelopers/desk-launcher-windows/releases/tag/v0.2.0-beta)** (pre-release).
+Última versión: **[0.3.0-beta](https://github.com/openwebdevelopers/desk-launcher-windows/releases/tag/v0.3.0-beta)** (pre-release).
 
 | Archivo | Descripción |
 |---|---|
-| [`DeskLauncher-0.2.0-beta-win-x64.zip`](https://github.com/openwebdevelopers/desk-launcher-windows/releases/download/v0.2.0-beta/DeskLauncher-0.2.0-beta-win-x64.zip) | Recomendado. Un solo `.exe`, no requiere instalar nada: descomprime y ejecuta. |
-| [`DeskLauncher-0.2.0-beta-win-x64-requiere-dotnet10.zip`](https://github.com/openwebdevelopers/desk-launcher-windows/releases/download/v0.2.0-beta/DeskLauncher-0.2.0-beta-win-x64-requiere-dotnet10.zip) | Versión liviana (0,3 MB); requiere el [runtime .NET 10 Desktop](https://dotnet.microsoft.com/download/dotnet/10.0). |
+| [`DeskLauncher-0.3.0-beta-win-x64.zip`](https://github.com/openwebdevelopers/desk-launcher-windows/releases/download/v0.3.0-beta/DeskLauncher-0.3.0-beta-win-x64.zip) | Recomendado. Un solo `.exe`, no requiere instalar nada: descomprime y ejecuta. |
+| [`DeskLauncher-0.3.0-beta-win-x64-requiere-dotnet10.zip`](https://github.com/openwebdevelopers/desk-launcher-windows/releases/download/v0.3.0-beta/DeskLauncher-0.3.0-beta-win-x64-requiere-dotnet10.zip) | Versión liviana (0,3 MB); requiere el [runtime .NET 10 Desktop](https://dotnet.microsoft.com/download/dotnet/10.0). |
 
 Windows 10/11 de 64 bits. El ejecutable no está firmado, por lo que SmartScreen puede mostrar una advertencia. Todas las versiones están en [Releases](https://github.com/openwebdevelopers/desk-launcher-windows/releases).
 
@@ -49,10 +49,11 @@ Las capturas usan una configuración de demostración (carpetas y apps genérica
   - Los iconos de la barra de tareas se colocan sobre la barra, a la izquierda de la bandeja del sistema (Windows no permite agregar elementos a la barra de tareas).
 - **Alineación al escritorio**: las carpetas del escritorio se ajustan a la cuadrícula real de iconos de Windows y, al arrastrar, se ve una sombra con la posición de destino.
 - **Animaciones**: zoom suave de los iconos al abrir el panel y aumento suave al pasar el mouse.
-- **Perfiles**: conjuntos independientes de carpetas; se cambian desde el Manager o el menú de la bandeja.
+- **Perfiles**: conjuntos independientes de carpetas; se cambian desde el Manager o el menú de la bandeja, y se pueden renombrar y eliminar (siempre queda al menos uno).
 - **Iconos personalizados**: cada carpeta y cada app puede usar un icono propio, elegido de una biblioteca central de iconos (agregar y quitar desde *Configuración*, o desde el modal que abre *Cambiar icono*). Acepta `.png .jpg .jpeg .bmp .ico .gif` y extrae iconos de `.exe .dll .lnk`.
 - **Orden de apps**: se reordenan arrastrando el asa de cada fila; el cambio se ve al instante en el listado.
 - **Tema**: Sistema (sigue el modo de Windows en vivo), Claro u Oscuro. Aplica también al menú de la bandeja.
+- **Idioma**: inglés y español. Por defecto sigue el idioma de Windows (inglés si no se detecta); se cambia en *Configuración* sin reiniciar.
 - **Bandeja del sistema**: abrir Manager (con pantalla de carga de 1,5 s), nueva carpeta, cambio de perfil y salir.
 - **Iniciar con Windows**: opción en *Configuración*.
 - **Instancia única**: abrir el ejecutable otra vez no crea una segunda copia.
@@ -89,7 +90,7 @@ Se guardan en `%APPDATA%\DeskLauncher\`:
 
 | Ruta | Contenido |
 |---|---|
-| `global.json` | Perfiles, perfil activo, tema, iniciar con Windows |
+| `global.json` | Perfiles, perfil activo, tema, idioma, iniciar con Windows |
 | `profiles\<id>\config.json` | Carpetas, apps, posición, estilo e iconos de cada perfil |
 | `icons\` | Biblioteca de iconos personalizados (PNG) |
 | `iconcache\` | Caché de iconos extraídos del sistema |
@@ -112,6 +113,7 @@ DeskLauncher/
   IconManager.cs           Módulo central de iconos (consulta, importación, biblioteca)
   IconLibraryView.*        Cuadrícula de la biblioteca de iconos
   IconPickerWindow.*       Modal para elegir o administrar iconos
+  Loc.cs                   Textos en inglés y español, detección del idioma
   ThemeService.cs          Tema claro/oscuro/sistema
   TrayMenuTheme.cs         Tema del menú de la bandeja
   SplashWindow.*           Pantalla de carga
