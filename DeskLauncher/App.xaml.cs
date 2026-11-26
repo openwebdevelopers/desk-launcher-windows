@@ -37,6 +37,18 @@ public partial class App : Application
         BuildTray();
         AutoStartService.Set(AppState.Global.StartOnLogin);
 
+        // DESKLAUNCHER_OPEN=<folder name>: open that folder's panel after startup (demos, screenshots).
+        if (Environment.GetEnvironmentVariable("DESKLAUNCHER_OPEN") is { Length: > 0 } open)
+        {
+            var t = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+            t.Tick += (_, _) =>
+            {
+                t.Stop();
+                _docks.FirstOrDefault(d => d.Folder.Name == open)?.ShowPanel();
+            };
+            t.Start();
+        }
+
     }
 
     TaskbarStripWindow? _strip;

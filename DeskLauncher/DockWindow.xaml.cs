@@ -186,6 +186,12 @@ public partial class DockWindow : Window
 
     // ---- expanded panel ----
 
+    /// <summary>Opens the folder panel if closed (used by DESKLAUNCHER_OPEN for screenshots).</summary>
+    public void ShowPanel()
+    {
+        if (_panel == null) TogglePanel();
+    }
+
     void TogglePanel()
     {
         if (_panel != null) { ClosePanel(); return; }

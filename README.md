@@ -26,13 +26,25 @@ Cada carpeta tiene su propio estilo de accesos.
 |---|---|---|
 | ![Estilo Arco](docs/screenshots/launcher-arco.png) | ![Estilo Anillo](docs/screenshots/launcher-anillo.png) | ![Estilo Phone App](docs/screenshots/launcher-phone.png) |
 
+### Barra de tareas
+
+Las carpetas también pueden vivir en la barra de tareas, con estilo *Caja* o *Lista*.
+
+| Caja | Lista |
+|---|---|
+| ![Barra de tareas: estilo Caja](docs/screenshots/taskbar-caja.png) | ![Barra de tareas: estilo Lista](docs/screenshots/taskbar-lista.png) |
+
 ### Manager
 
 ![Manager: carpetas y apps (tema oscuro)](docs/screenshots/manager-carpetas.png)
 
-| Perfiles | Configuración | Tema claro |
-|---|---|---|
-| ![Perfiles](docs/screenshots/manager-perfiles.png) | ![Configuración](docs/screenshots/manager-configuracion.png) | ![Tema claro](docs/screenshots/manager-claro.png) |
+| Perfiles (renombrar y eliminar) | Configuración (tema e idioma) |
+|---|---|
+| ![Perfiles](docs/screenshots/manager-perfiles.png) | ![Configuración](docs/screenshots/manager-configuracion.png) |
+
+| Tema claro | Idioma inglés |
+|---|---|
+| ![Tema claro](docs/screenshots/manager-claro.png) | ![Manager en inglés](docs/screenshots/manager-english.png) |
 
 Las capturas usan una configuración de demostración (carpetas y apps genéricas de Windows), ver [Capturas de pantalla](#capturas-de-pantalla-1).
 
@@ -75,13 +87,14 @@ dotnet build
 
 - `--manager`: abre el Manager al terminar la pantalla de carga.
 - Variable de entorno `DESKLAUNCHER_DATA`: usa otra carpeta de datos en lugar de `%APPDATA%\DeskLauncher\` (útil para demos, pruebas y capturas).
+- Variable de entorno `DESKLAUNCHER_OPEN`: nombre de una carpeta del escritorio cuyo panel se abre solo 2 s después de iniciar (útil para capturas).
 
 ## Capturas de pantalla
 
 Para regenerar las capturas sin tocar tus datos:
 
 1. Crea una carpeta con un `global.json` y un `profiles\<id>\config.json` de demostración (carpetas con estilos `Arc`, `Ring` y `Phone`, y `CollapseOnMouseLeave` en `false`).
-2. Cierra DeskLauncher y ejecútalo con `DESKLAUNCHER_DATA` apuntando a esa carpeta (más `--manager` para el Manager).
+2. Cierra DeskLauncher y ejecútalo con `DESKLAUNCHER_DATA` apuntando a esa carpeta (más `--manager` para el Manager, o `DESKLAUNCHER_OPEN=<carpeta>` para abrir un panel).
 3. Captura las ventanas y guarda los PNG en `docs/screenshots/`.
 
 ## Datos de usuario
