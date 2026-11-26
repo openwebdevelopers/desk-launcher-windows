@@ -15,6 +15,8 @@ public sealed class GlobalConfig
     public bool StartOnLogin { get; set; }
     /// <summary>"System" (follow Windows), "Light" or "Dark".</summary>
     public string Theme { get; set; } = "System";
+    /// <summary>"System" (Windows language, English fallback), "en" or "es".</summary>
+    public string Language { get; set; } = "System";
     public string ActiveProfileId { get; set; } = "";
     public List<Profile> Profiles { get; set; } = new();
 }

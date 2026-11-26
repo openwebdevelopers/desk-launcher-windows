@@ -31,6 +31,12 @@ public sealed class ConfigStore
     public ProfileConfig LoadProfile(string id) => Load<ProfileConfig>(ProfilePath(id));
     public void SaveProfile(string id, ProfileConfig c) => Save(ProfilePath(id), c);
 
+    public void DeleteProfile(string id)
+    {
+        try { Directory.Delete(Path.GetDirectoryName(ProfilePath(id))!, true); }
+        catch (IOException) { }
+    }
+
     public static T Load<T>(string path) where T : new()
     {
         foreach (var p in new[] { path, path + ".bak" })

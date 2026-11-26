@@ -127,9 +127,9 @@ public sealed class IconManager
     {
         var dlg = new OpenFileDialog
         {
-            Title = "Agregar iconos",
+            Title = Loc.T("AddIcons"),
             Multiselect = true,
-            Filter = "Iconos e imágenes|*.png;*.jpg;*.jpeg;*.bmp;*.ico;*.gif;*.exe;*.dll;*.lnk|Todos los archivos|*.*",
+            Filter = Loc.T("FilterIcons"),
         };
         bool ok = owner != null ? dlg.ShowDialog(owner) == true : dlg.ShowDialog() == true;
         var added = new List<string>();
@@ -141,7 +141,7 @@ public sealed class IconManager
             if (name != null) added.Add(name); else failed++;
         }
         if (failed > 0)
-            MessageBox.Show($"{failed} archivo(s) no se pudieron usar como icono.", "DeskLauncher");
+            MessageBox.Show(Loc.T("IconsFailed", failed), "DeskLauncher");
         return added;
     }
 

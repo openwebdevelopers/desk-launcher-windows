@@ -47,9 +47,12 @@ public partial class ManagerWindow : Window
         var active = AppState.Global.Profiles.FirstOrDefault(p => p.Id == AppState.Global.ActiveProfileId);
         ProfileList.SelectedItem = active;
         ActiveProfileText.Text = active?.Name ?? "";
+        Resources["DeleteProfileVis"] = AppState.Global.Profiles.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
         AutoStartBox.IsChecked = AppState.Global.StartOnLogin;
         ThemeBox.SelectedItem = ThemeBox.Items.OfType<ComboBoxItem>()
             .FirstOrDefault(i => (string?)i.Tag == AppState.Global.Theme) ?? ThemeBox.Items[0];
+        LangBox.SelectedItem = LangBox.Items.OfType<ComboBoxItem>()
+            .FirstOrDefault(i => (string?)i.Tag == AppState.Global.Language) ?? LangBox.Items[0];
         _loading = false;
         ReloadFolders(null);
     }
@@ -73,7 +76,7 @@ public partial class ManagerWindow : Window
     void UpdateLibraryCount()
     {
         int n = AppState.Icons.List().Count;
-        LibraryCountText.Text = n == 1 ? "1 icono agregado" : $"{n} iconos agregados";
+        LibraryCountText.Text = n == 1 ? Loc.T("IconsAdded1") : Loc.T("IconsAddedN", n);
     }
 
     void OpenLibrary_Click(object sender, RoutedEventArgs e)
@@ -148,8 +151,26 @@ public partial class ManagerWindow : Window
 
     void AddProfile_Click(object sender, RoutedEventArgs e)
     {
-        var name = Prompt.Ask("Nombre del perfil", "Nuevo perfil", this);
+        var name = Prompt.Ask(Loc.T("ProfileName"), Loc.T("NewProfile"), this);
         if (!string.IsNullOrWhiteSpace(name)) AppState.AddProfile(name.Trim());
+    }
+
+    void RenameProfile_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.DataContext is not Profile p) return;
+        var name = Prompt.Ask(Loc.T("ProfileName"), p.Name, this)?.Trim();
+        if (string.IsNullOrEmpty(name) || name == p.Name) return;
+        AppState.RenameProfile(p, name);
+        LoadAll();
+    }
+
+    void DeleteProfile_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.DataContext is not Profile p || AppState.Global.Profiles.Count <= 1) return;
+        if (MessageBox.Show(this, Loc.T("ConfirmDeleteProfile", p.Name), "DeskLauncher",
+                MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
+        AppState.DeleteProfile(p); // raises Rebuild (when active) -> LoadAll
+        LoadAll();
     }
 
     void Folder_Changed(object sender, SelectionChangedEventArgs e)
@@ -171,7 +192,7 @@ public partial class ManagerWindow : Window
 
     void AddFolder_Click(object sender, RoutedEventArgs e)
     {
-        var f = AppState.AddFolder("Nueva carpeta");
+        var f = AppState.AddFolder(Loc.T("NewFolder"));
         ReloadFolders(f);
     }
 
@@ -195,9 +216,9 @@ public partial class ManagerWindow : Window
         if (SelectedFolder is not { } f) return;
         var dlg = new OpenFileDialog
         {
-            Title = "Elegir apps",
+            Title = Loc.T("ChooseApps"),
             Multiselect = true,
-            Filter = "Apps y accesos directos|*.exe;*.lnk|Todos los archivos|*.*",
+            Filter = Loc.T("FilterApps"),
         };
         if (dlg.ShowDialog(this) != true) return;
         foreach (var p in dlg.FileNames)
@@ -339,6 +360,34 @@ public partial class ManagerWindow : Window
         ThemeService.Apply();
     }
 
+    void Lang_Changed(object sender, SelectionChangedEventArgs e)
+    {
+        if (_loading || LangBox.SelectedItem is not ComboBoxItem { Tag: string lang }) return;
+        if (lang == AppState.Global.Language) return;
+        AppState.Global.Language = lang;
+        AppState.SaveGlobal();
+        Loc.Apply(lang); // raises Loc.Changed when the effective language differs
+    }
+
+    /// <summary>Recreates the window (same page) so every XAML string picks up the new language.</summary>
+    public static void Reopen()
+    {
+        if (_instance == null) return;
+        var old = _instance;
+        bool settings = old.NavSettings.IsChecked == true, profiles = old.NavProfiles.IsChecked == true;
+        var pos = (old.Left, old.Top, old.Width, old.Height, old.WindowState);
+        old.Close(); // clears _instance
+        ShowSingleton();
+        var w = _instance!;
+        if (pos.WindowState == WindowState.Normal)
+        {
+            w.WindowStartupLocation = WindowStartupLocation.Manual;
+            (w.Left, w.Top, w.Width, w.Height) = (pos.Left, pos.Top, pos.Width, pos.Height);
+        }
+        if (settings) w.NavSettings.IsChecked = true;
+        else if (profiles) w.NavProfiles.IsChecked = true;
+    }
+
     void AutoStart_Click(object sender, RoutedEventArgs e)
     {
         AppState.Global.StartOnLogin = AutoStartBox.IsChecked == true;
@@ -354,7 +403,7 @@ public static class Prompt
     {
         var box = new TextBox { Text = defaultValue, Margin = new Thickness(0, 0, 0, 12), MinWidth = 280 };
         var ok = new Button { Content = "OK", IsDefault = true, Width = 70, Margin = new Thickness(0, 0, 6, 0) };
-        var cancel = new Button { Content = "Cancelar", IsCancel = true, Width = 70 };
+        var cancel = new Button { Content = Loc.T("Cancel"), IsCancel = true, Width = 70 };
         var buttons = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
         buttons.Children.Add(ok);
         buttons.Children.Add(cancel);

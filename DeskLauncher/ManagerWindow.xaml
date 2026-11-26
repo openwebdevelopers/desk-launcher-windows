@@ -13,6 +13,8 @@
         <BooleanToVisibilityConverter x:Key="B2V"/>
         <!-- Toggled from code-behind: Collapsed makes every button icon-only (narrow window). -->
         <Visibility x:Key="LabelVis">Visible</Visibility>
+        <!-- Collapsed when only one profile is left (cannot be deleted). -->
+        <Visibility x:Key="DeleteProfileVis">Visible</Visibility>
         <Style x:Key="BtnLabel" TargetType="TextBlock">
             <Setter Property="Margin" Value="8,0,0,0"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -32,36 +34,36 @@
                 <StackPanel DockPanel.Dock="Top" Margin="20,22,20,18">
                     <TextBlock Text="DeskLauncher" FontFamily="{StaticResource UiDisplayFont}"
                                FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
-                    <TextBlock Text="Manager" Style="{StaticResource Caption}"/>
+                    <TextBlock Text="{local:Tr Manager}" Style="{StaticResource Caption}"/>
                 </StackPanel>
 
                 <Border DockPanel.Dock="Bottom" Style="{StaticResource Card}" Margin="10" Padding="12,10">
                     <StackPanel>
                         <TextBlock x:Name="ActiveProfileText" Foreground="{DynamicResource TextPrimary}" FontSize="12"
                                    FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
-                        <TextBlock Text="Perfil activo" Style="{StaticResource Caption}"/>
+                        <TextBlock Text="{local:Tr ActiveProfile}" Style="{StaticResource Caption}"/>
                     </StackPanel>
                 </Border>
 
                 <StackPanel>
-                    <TextBlock Text="NAVEGACIÓN" Style="{StaticResource Caption}" Margin="20,0,0,8"/>
+                    <TextBlock Text="{local:Tr Navigation}" Style="{StaticResource Caption}" Margin="20,0,0,8"/>
                     <RadioButton x:Name="NavFolders" Style="{StaticResource NavItem}" GroupName="nav" IsChecked="True"
                                  Checked="Nav_Checked">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="&#xE8B7;" Style="{StaticResource Glyph}" Margin="0,0,12,0"/>
-                            <TextBlock Text="Carpetas y apps"/>
+                            <TextBlock Text="{local:Tr FoldersApps}"/>
                         </StackPanel>
                     </RadioButton>
                     <RadioButton x:Name="NavProfiles" Style="{StaticResource NavItem}" GroupName="nav" Checked="Nav_Checked">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="&#xE77B;" Style="{StaticResource Glyph}" Margin="0,0,12,0"/>
-                            <TextBlock Text="Perfiles"/>
+                            <TextBlock Text="{local:Tr Profiles}"/>
                         </StackPanel>
                     </RadioButton>
                     <RadioButton x:Name="NavSettings" Style="{StaticResource NavItem}" GroupName="nav" Checked="Nav_Checked">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="&#xE713;" Style="{StaticResource Glyph}" Margin="0,0,12,0"/>
-                            <TextBlock Text="Configuración"/>
+                            <TextBlock Text="{local:Tr Settings}"/>
                         </StackPanel>
                     </RadioButton>
                 </StackPanel>
@@ -88,8 +90,8 @@
 
                 <DockPanel Margin="0,0,144,18" MinHeight="112">
                     <StackPanel>
-                        <TextBlock Text="Carpetas y apps" Style="{StaticResource PageTitle}"/>
-                        <TextBlock Text="Organiza las carpetas del escritorio y las apps que contiene."
+                        <TextBlock Text="{local:Tr FoldersApps}" Style="{StaticResource PageTitle}"/>
+                        <TextBlock Text="{local:Tr FoldersAppsDesc}"
                                    Foreground="{DynamicResource TextSecondary}" Margin="0,4,0,0"/>
                     </StackPanel>
                 </DockPanel>
@@ -106,17 +108,17 @@
                         <DockPanel>
                             <DockPanel DockPanel.Dock="Top" Margin="4,0,0,10">
                                 <Button DockPanel.Dock="Right" Style="{StaticResource AccentButton}" Padding="9,6"
-                                        Click="AddFolder_Click" ToolTip="Nueva carpeta">
+                                        Click="AddFolder_Click" ToolTip="{local:Tr NewFolder}">
                                     <TextBlock Text="&#xE710;" Style="{StaticResource Glyph}" FontSize="13"/>
                                 </Button>
-                                <TextBlock Text="CARPETAS" Style="{StaticResource SectionLabel}" VerticalAlignment="Center"/>
+                                <TextBlock Text="{local:Tr FoldersLabel}" Style="{StaticResource SectionLabel}" VerticalAlignment="Center"/>
                             </DockPanel>
                             <Button x:Name="DeleteFolderBtn" DockPanel.Dock="Bottom" Margin="0,10,0,0"
                                     HorizontalAlignment="Stretch" IsEnabled="False"
-                                    Click="DeleteFolder_Click" ToolTip="Eliminar carpeta seleccionada">
+                                    Click="DeleteFolder_Click" ToolTip="{local:Tr DeleteFolderTip}">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                     <TextBlock Text="&#xE74D;" Style="{StaticResource DangerGlyph}" FontSize="13"/>
-                                    <TextBlock Text="Eliminar carpeta" Style="{StaticResource DangerText}"/>
+                                    <TextBlock Text="{local:Tr DeleteFolder}" Style="{StaticResource DangerText}"/>
                                 </StackPanel>
                             </Button>
                             <ListBox x:Name="FolderList" Background="Transparent" BorderThickness="0"
@@ -134,7 +136,7 @@
                                             <StackPanel VerticalAlignment="Center">
                                                 <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
                                                 <TextBlock Style="{StaticResource Caption}">
-                                                    <Run Text="{Binding Shortcuts.Count, Mode=OneWay}"/><Run Text=" accesos"/>
+                                                    <Run Text="{Binding Shortcuts.Count, Mode=OneWay}"/><Run Text="{local:Tr ShortcutsSuffix}"/>
                                                 </TextBlock>
                                             </StackPanel>
                                         </StackPanel>
@@ -161,20 +163,20 @@
                                     </Grid>
                                 </Border>
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                    <TextBlock Text="NOMBRE DE LA CARPETA" Style="{StaticResource Caption}" Margin="0,0,0,4"/>
+                                    <TextBlock Text="{local:Tr FolderName}" Style="{StaticResource Caption}" Margin="0,0,0,4"/>
                                     <TextBox x:Name="NameBox" LostFocus="Name_LostFocus"/>
                                 </StackPanel>
                                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Bottom" Margin="12,0,0,0">
-                                    <Button Click="FolderIcon_Click" ToolTip="Cambiar icono">
+                                    <Button Click="FolderIcon_Click" ToolTip="{local:Tr ChangeIcon}">
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="&#xEB9F;" Style="{StaticResource Glyph}" FontSize="14"/>
-                                            <TextBlock Text="Cambiar icono" Style="{StaticResource BtnLabel}"/>
+                                            <TextBlock Text="{local:Tr ChangeIcon}" Style="{StaticResource BtnLabel}"/>
                                         </StackPanel>
                                     </Button>
-                                    <Button Margin="8,0,0,0" Click="FolderIconReset_Click" ToolTip="Restablecer icono">
+                                    <Button Margin="8,0,0,0" Click="FolderIconReset_Click" ToolTip="{local:Tr ResetIcon}">
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="&#xE777;" Style="{StaticResource Glyph}" FontSize="14"/>
-                                            <TextBlock Text="Restablecer" Style="{StaticResource BtnLabel}"/>
+                                            <TextBlock Text="{local:Tr Reset}" Style="{StaticResource BtnLabel}"/>
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>
@@ -192,53 +194,53 @@
                                 </Grid.RowDefinitions>
 
                                 <StackPanel Grid.ColumnSpan="2" Margin="0,0,0,8">
-                                    <TextBlock Text="Ubicación y estilo" FontWeight="SemiBold"/>
-                                    <TextBlock Text="Dónde aparece la carpeta y cómo se muestran sus apps en cada lugar."
+                                    <TextBlock Text="{local:Tr LocationStyle}" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{local:Tr LocationStyleDesc}"
                                                Style="{StaticResource Caption}" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"/>
                                 </StackPanel>
 
-                                <CheckBox x:Name="DesktopChk" Grid.Row="1" Content="Escritorio" VerticalAlignment="Center"
+                                <CheckBox x:Name="DesktopChk" Grid.Row="1" Content="{local:Tr Desktop}" VerticalAlignment="Center"
                                           Click="Location_Click"/>
                                 <ComboBox x:Name="PanelStyleBox" Grid.Row="1" Grid.Column="1" Width="150" Margin="0,0,0,6"
                                           SelectionChanged="PanelStyle_Changed">
-                                    <ComboBoxItem Tag="Arc" Content="Arco"/>
-                                    <ComboBoxItem Tag="Ring" Content="Anillo"/>
-                                    <ComboBoxItem Tag="Phone" Content="Phone App"/>
+                                    <ComboBoxItem Tag="Arc" Content="{local:Tr StyleArc}"/>
+                                    <ComboBoxItem Tag="Ring" Content="{local:Tr StyleRing}"/>
+                                    <ComboBoxItem Tag="Phone" Content="{local:Tr StylePhone}"/>
                                 </ComboBox>
 
-                                <CheckBox x:Name="TaskbarChk" Grid.Row="2" Content="Barra de tareas" VerticalAlignment="Center"
+                                <CheckBox x:Name="TaskbarChk" Grid.Row="2" Content="{local:Tr Taskbar}" VerticalAlignment="Center"
                                           Click="Location_Click"/>
                                 <ComboBox x:Name="TaskbarStyleBox" Grid.Row="2" Grid.Column="1" Width="150"
                                           SelectionChanged="TaskbarStyle_Changed">
-                                    <ComboBoxItem Tag="Box" Content="Caja"/>
-                                    <ComboBoxItem Tag="List" Content="Lista"/>
+                                    <ComboBoxItem Tag="Box" Content="{local:Tr StyleBox}"/>
+                                    <ComboBoxItem Tag="List" Content="{local:Tr StyleList}"/>
                                 </ComboBox>
                             </Grid>
 
                             <DockPanel DockPanel.Dock="Top" Margin="4,0,0,8">
-                                <TextBlock Text="APLICACIONES VINCULADAS" Style="{StaticResource SectionLabel}"
+                                <TextBlock Text="{local:Tr LinkedApps}" Style="{StaticResource SectionLabel}"
                                            VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                             </DockPanel>
 
                             <WrapPanel DockPanel.Dock="Bottom" Margin="0,12,0,0">
-                                <Button Click="AddApp_Click" Margin="0,0,8,6" ToolTip="Agregar app…">
+                                <Button Click="AddApp_Click" Margin="0,0,8,6" ToolTip="{local:Tr AddApp}">
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Text="&#xE710;" Style="{StaticResource Glyph}" FontSize="13"/>
-                                        <TextBlock Text="Agregar app…" Style="{StaticResource BtnLabel}"/>
+                                        <TextBlock Text="{local:Tr AddApp}" Style="{StaticResource BtnLabel}"/>
                                     </StackPanel>
                                 </Button>
                                 <Button x:Name="AppIconBtn" Click="AppIcon_Click" Margin="0,0,8,6" IsEnabled="False"
-                                        ToolTip="Cambiar icono de la app seleccionada">
+                                        ToolTip="{local:Tr AppIconTip}">
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Text="&#xEB9F;" Style="{StaticResource ActionGlyph}" FontSize="14"/>
-                                        <TextBlock Text="Icono de app" Style="{StaticResource BtnLabel}"/>
+                                        <TextBlock Text="{local:Tr AppIcon}" Style="{StaticResource BtnLabel}"/>
                                     </StackPanel>
                                 </Button>
                                 <Button x:Name="AppResetBtn" Click="AppIconReset_Click" Margin="0,0,8,6" IsEnabled="False"
-                                        ToolTip="Restablecer icono de la app seleccionada">
+                                        ToolTip="{local:Tr AppResetTip}">
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Text="&#xE777;" Style="{StaticResource ActionGlyph}" FontSize="14"/>
-                                        <TextBlock Text="Restablecer" Style="{StaticResource BtnLabel}"/>
+                                        <TextBlock Text="{local:Tr Reset}" Style="{StaticResource BtnLabel}"/>
                                     </StackPanel>
                                 </Button>
                             </WrapPanel>
@@ -260,7 +262,7 @@
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
                                             <Border Tag="grip" Width="24" Margin="0,0,6,0" Background="Transparent"
-                                                    Cursor="SizeAll" ToolTip="Arrastra para cambiar el orden">
+                                                    Cursor="SizeAll" ToolTip="{local:Tr DragToReorder}">
                                                 <TextBlock Text="&#xE76F;" Style="{StaticResource Glyph}"
                                                            Foreground="{DynamicResource TextSecondary}"/>
                                             </Border>
@@ -273,7 +275,7 @@
                                                            TextTrimming="CharacterEllipsis"/>
                                             </StackPanel>
                                             <Button Grid.Column="3" Margin="8,0,0,0" Padding="9,7" VerticalAlignment="Center"
-                                                    ToolTip="Quitar de la carpeta" Click="DeleteApp_Click">
+                                                    ToolTip="{local:Tr RemoveFromFolder}" Click="DeleteApp_Click">
                                                 <TextBlock Text="&#xE74D;" Style="{StaticResource RowDeleteGlyph}" FontSize="13"/>
                                             </Button>
                                         </Grid>
@@ -293,32 +295,54 @@
                 </Grid.RowDefinitions>
                 <DockPanel Margin="0,0,144,18" MinHeight="112">
                     <Button DockPanel.Dock="Right" Style="{StaticResource AccentButton}" VerticalAlignment="Top"
-                            Click="AddProfile_Click" ToolTip="Nuevo perfil">
+                            Click="AddProfile_Click" ToolTip="{local:Tr NewProfile}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="&#xE710;" Style="{StaticResource Glyph}" FontSize="13"/>
-                            <TextBlock Text="Nuevo perfil" Margin="8,0,0,0"/>
+                            <TextBlock Text="{local:Tr NewProfile}" Margin="8,0,0,0"/>
                         </StackPanel>
                     </Button>
                     <StackPanel>
-                        <TextBlock Text="Perfiles" Style="{StaticResource PageTitle}"/>
-                        <TextBlock Text="Cambia el conjunto de carpetas visibles en el escritorio."
+                        <TextBlock Text="{local:Tr Profiles}" Style="{StaticResource PageTitle}"/>
+                        <TextBlock Text="{local:Tr ProfilesDesc}"
                                    Foreground="{DynamicResource TextSecondary}" Margin="0,4,0,0"/>
                     </StackPanel>
                 </DockPanel>
                 <Border Grid.Row="1" Style="{StaticResource Card}" MinWidth="460" MaxWidth="560" HorizontalAlignment="Left">
                     <DockPanel>
-                        <TextBlock DockPanel.Dock="Top" Text="PERFILES DISPONIBLES" Style="{StaticResource SectionLabel}" Margin="4,0,0,10"/>
+                        <TextBlock DockPanel.Dock="Top" Text="{local:Tr AvailableProfiles}" Style="{StaticResource SectionLabel}" Margin="4,0,0,10"/>
                         <ListBox x:Name="ProfileList" Background="Transparent" BorderThickness="0"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                  ItemContainerStyle="{StaticResource RowItem}" SelectionChanged="Profile_Changed">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
+                                  <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
                                     <StackPanel Orientation="Horizontal">
                                         <Border Width="36" Height="36" CornerRadius="8" Background="{DynamicResource TileBg}" Margin="0,0,12,0">
-                                            <TextBlock Text="&#xE77B;" Style="{StaticResource Glyph}" Foreground="{DynamicResource Accent}"/>
+                                            <!-- folder group: two stacked folders -->
+                                            <Grid Width="22" Height="22">
+                                                <TextBlock Text="&#xE8B7;" Style="{StaticResource Glyph}" FontSize="15"
+                                                           Foreground="{DynamicResource TextSecondary}" Margin="-5,-5,0,0"/>
+                                                <TextBlock Text="&#xE8B7;" Style="{StaticResource Glyph}" FontSize="15"
+                                                           Foreground="{DynamicResource Accent}" Margin="5,5,0,0"/>
+                                            </Grid>
                                         </Border>
-                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" VerticalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis"/>
                                     </StackPanel>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Button Padding="9,7" Margin="8,0,0,0" ToolTip="{local:Tr RenameProfile}" Click="RenameProfile_Click">
+                                            <TextBlock Text="&#xE70F;" Style="{StaticResource ActionGlyph}" FontSize="13"/>
+                                        </Button>
+                                        <Button Padding="9,7" Margin="6,0,0,0" ToolTip="{local:Tr DeleteProfile}" Click="DeleteProfile_Click"
+                                                Visibility="{DynamicResource DeleteProfileVis}">
+                                            <TextBlock Text="&#xE74D;" Style="{StaticResource RowDeleteGlyph}" FontSize="13"/>
+                                        </Button>
+                                    </StackPanel>
+                                  </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
@@ -333,8 +357,8 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <StackPanel Margin="0,0,144,18" MinHeight="112">
-                    <TextBlock Text="Configuración" Style="{StaticResource PageTitle}"/>
-                    <TextBlock Text="Preferencias generales de DeskLauncher."
+                    <TextBlock Text="{local:Tr Settings}" Style="{StaticResource PageTitle}"/>
+                    <TextBlock Text="{local:Tr SettingsDesc}"
                                Foreground="{DynamicResource TextSecondary}" Margin="0,4,0,0"/>
                 </StackPanel>
                 <Grid Grid.Row="1">
@@ -347,30 +371,43 @@
                             <DockPanel Margin="0,0,0,14">
                                 <ComboBox x:Name="ThemeBox" DockPanel.Dock="Right" Width="150"
                                           SelectionChanged="Theme_Changed">
-                                    <ComboBoxItem Tag="System" Content="Sistema"/>
-                                    <ComboBoxItem Tag="Light" Content="Claro"/>
-                                    <ComboBoxItem Tag="Dark" Content="Oscuro"/>
+                                    <ComboBoxItem Tag="System" Content="{local:Tr System}"/>
+                                    <ComboBoxItem Tag="Light" Content="{local:Tr Light}"/>
+                                    <ComboBoxItem Tag="Dark" Content="{local:Tr Dark}"/>
                                 </ComboBox>
                                 <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Apariencia" FontWeight="SemiBold"/>
-                                    <TextBlock Text="Sistema sigue el modo claro/oscuro de Windows."
+                                    <TextBlock Text="{local:Tr Appearance}" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{local:Tr AppearanceDesc}"
                                                Style="{StaticResource Caption}" Margin="0,2,0,0"/>
                                 </StackPanel>
                             </DockPanel>
-                            <CheckBox x:Name="AutoStartBox" Content="Iniciar automáticamente con Windows" Click="AutoStart_Click"/>
+                            <DockPanel Margin="0,0,0,14">
+                                <ComboBox x:Name="LangBox" DockPanel.Dock="Right" Width="150"
+                                          SelectionChanged="Lang_Changed">
+                                    <ComboBoxItem Tag="System" Content="{local:Tr System}"/>
+                                    <ComboBoxItem Tag="en" Content="English"/>
+                                    <ComboBoxItem Tag="es" Content="Español"/>
+                                </ComboBox>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="{local:Tr Language}" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{local:Tr LanguageDesc}"
+                                               Style="{StaticResource Caption}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </DockPanel>
+                            <CheckBox x:Name="AutoStartBox" Content="{local:Tr AutoStart}" Click="AutoStart_Click"/>
                         </StackPanel>
                     </Border>
                     <Border Grid.Row="1" Style="{StaticResource Card}" VerticalAlignment="Top">
                         <DockPanel>
                             <Button DockPanel.Dock="Right" VerticalAlignment="Center" Click="OpenLibrary_Click"
-                                    ToolTip="Abrir biblioteca">
+                                    ToolTip="{local:Tr OpenLibrary}">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xEB9F;" Style="{StaticResource Glyph}" FontSize="14"/>
-                                    <TextBlock Text="Abrir biblioteca" Margin="8,0,0,0"/>
+                                    <TextBlock Text="{local:Tr OpenLibrary}" Margin="8,0,0,0"/>
                                 </StackPanel>
                             </Button>
                             <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="Biblioteca de iconos" FontWeight="SemiBold"/>
+                                <TextBlock Text="{local:Tr IconLibrary}" FontWeight="SemiBold"/>
                                 <TextBlock x:Name="LibraryCountText" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
                             </StackPanel>
                         </DockPanel>

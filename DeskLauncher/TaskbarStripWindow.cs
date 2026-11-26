@@ -134,25 +134,25 @@ public sealed class TaskbarStripWindow : Window
     ContextMenu BuildMenu(FolderConfig f)
     {
         var menu = new ContextMenu();
-        var open = new MenuItem { Header = "Abrir Manager" };
+        var open = new MenuItem { Header = Loc.T("OpenManager") };
         open.Click += (_, _) => ManagerWindow.ShowSingleton();
 
-        var style = new MenuItem { Header = "Estilo en barra de tareas" };
+        var style = new MenuItem { Header = Loc.T("TaskbarStyle") };
         MenuItem Opt(string header, string key)
         {
             var m = new MenuItem { Header = header, IsCheckable = true, Tag = key };
             m.Click += (_, _) => AppState.SetTaskbarStyle(f, key);
             return m;
         }
-        var box = Opt("Caja", PanelStyles.Box);
-        var list = Opt("Lista", PanelStyles.List);
+        var box = Opt(Loc.T("StyleBox"), PanelStyles.Box);
+        var list = Opt(Loc.T("StyleList"), PanelStyles.List);
         style.Items.Add(box);
         style.Items.Add(list);
 
-        var desktop = new MenuItem { Header = "Mostrar en escritorio", IsCheckable = true };
+        var desktop = new MenuItem { Header = Loc.T("ShowOnDesktop"), IsCheckable = true };
         desktop.Click += (_, _) => AppState.SetFolderLocation(f, desktop.IsChecked, true);
 
-        var remove = new MenuItem { Header = "Quitar de la barra de tareas" };
+        var remove = new MenuItem { Header = Loc.T("RemoveFromTaskbar") };
         remove.Click += (_, _) => AppState.SetFolderLocation(f, f.ShowOnDesktop, false);
 
         menu.Opened += (_, _) =>

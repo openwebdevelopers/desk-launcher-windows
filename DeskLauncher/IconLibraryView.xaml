@@ -1,18 +1,19 @@
 <UserControl x:Class="DeskLauncher.IconLibraryView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:DeskLauncher">
     <DockPanel>
         <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,12,0,0">
             <Button Click="Add_Click">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="&#xE710;" Style="{StaticResource Glyph}" FontSize="13" Margin="0,0,8,0"/>
-                    <TextBlock Text="Agregar icono…"/>
+                    <TextBlock Text="{local:Tr AddIcon}"/>
                 </StackPanel>
             </Button>
             <Button Margin="6,0,0,0" Click="Remove_Click">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="&#xE74D;" Style="{StaticResource Glyph}" FontSize="13" Margin="0,0,8,0"/>
-                    <TextBlock Text="Quitar seleccionado"/>
+                    <TextBlock Text="{local:Tr RemoveSelected}"/>
                 </StackPanel>
             </Button>
             <TextBlock x:Name="CountText" Style="{StaticResource Caption}" VerticalAlignment="Center" Margin="14,0,0,0"/>
@@ -35,7 +36,7 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <TextBlock x:Name="EmptyText" Text="Sin iconos. Agrega imágenes, .ico o .exe."
+            <TextBlock x:Name="EmptyText" Text="{local:Tr NoIcons}"
                        Style="{StaticResource Caption}" HorizontalAlignment="Center" VerticalAlignment="Center"
                        Visibility="Collapsed"/>
         </Grid>

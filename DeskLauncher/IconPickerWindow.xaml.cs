@@ -25,9 +25,9 @@ public partial class IconPickerWindow : Window
     public static void Manage(Window? owner)
     {
         var w = new IconPickerWindow(null);
-        w.Title = "Biblioteca de iconos";
+        w.Title = Loc.T("IconLibrary");
         w.OkButton.Visibility = Visibility.Collapsed;
-        w.CancelButton.Content = "Cerrar";
+        w.CancelButton.Content = Loc.T("Close");
         w.Library.ActivationDisabled = true;
         if (owner != null && owner.IsVisible)
         {

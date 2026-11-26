@@ -334,20 +334,20 @@ public sealed class ExpandedPanelWindow : Window
         };
 
         var menu = new ContextMenu();
-        var remove = new MenuItem { Header = "Quitar" };
+        var remove = new MenuItem { Header = Loc.T("Remove") };
         remove.Click += (_, _) =>
         {
             Dismiss();
             AppState.RemoveShortcut(_folder, s);
         };
-        var change = new MenuItem { Header = "Cambiar icono…" };
+        var change = new MenuItem { Header = Loc.T("ChangeIconDots") };
         change.Click += (_, _) =>
         {
             Dismiss(); // panel closes on deactivation anyway; the dialog would trigger that
             var name = IconPickerWindow.Pick(null, s.CustomIcon);
             if (name != null) AppState.SetShortcutIcon(_folder, s, name);
         };
-        var reset = new MenuItem { Header = "Restablecer icono" };
+        var reset = new MenuItem { Header = Loc.T("ResetIconMenu") };
         reset.Click += (_, _) =>
         {
             Dismiss();

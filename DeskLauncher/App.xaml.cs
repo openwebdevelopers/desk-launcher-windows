@@ -27,7 +27,9 @@ public partial class App : Application
         // --manager: open the Manager when the startup splash ends.
         SplashWindow.Run(e.Args.Contains("--manager") ? ManagerWindow.ShowSingleton : null);
         AppState.Init();
+        Loc.Apply(AppState.Global.Language);
         ThemeService.Apply();
+        Loc.Changed += OnLanguageChanged;
         AppState.Rebuild += BuildDocks;
         AppState.FolderChanged += OnFolderChanged;
 
@@ -94,13 +96,37 @@ public partial class App : Application
         SyncStrip();
     }
 
+    void OnLanguageChanged()
+    {
+        if (_tray != null)
+        {
+            var old = _tray.ContextMenuStrip;
+            _tray.ContextMenuStrip = BuildTrayMenu();
+            old?.Dispose();
+        }
+        BuildDocks(); // dock / strip context menus are built per window
+        Dispatcher.BeginInvoke(ManagerWindow.Reopen); // not inside the old window's own event
+    }
+
     void BuildTray()
     {
-        var menu = new System.Windows.Forms.ContextMenuStrip();
-        menu.Items.Add("Abrir Manager", null, (_, _) => OpenFromTray());
-        menu.Items.Add("Nueva carpeta", null, (_, _) => AppState.AddFolder("Nueva carpeta"));
+        _tray = new System.Windows.Forms.NotifyIcon
+        {
+            Icon = LoadTrayIcon(),
+            Text = "DeskLauncher",
+            ContextMenuStrip = BuildTrayMenu(),
+            Visible = true,
+        };
+        _tray.DoubleClick += (_, _) => OpenFromTray();
+    }
 
-        var profiles = new System.Windows.Forms.ToolStripMenuItem("Perfil");
+    System.Windows.Forms.ContextMenuStrip BuildTrayMenu()
+    {
+        var menu = new System.Windows.Forms.ContextMenuStrip();
+        menu.Items.Add(Loc.T("OpenManager"), null, (_, _) => OpenFromTray());
+        menu.Items.Add(Loc.T("NewFolder"), null, (_, _) => AppState.AddFolder(Loc.T("NewFolder")));
+
+        var profiles = new System.Windows.Forms.ToolStripMenuItem(Loc.T("Profile"));
         profiles.DropDownOpening += (_, _) =>
         {
             profiles.DropDownItems.Clear();
@@ -117,18 +143,10 @@ public partial class App : Application
         menu.Items.Add(profiles);
 
         menu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
-        menu.Items.Add("Salir", null, (_, _) => Shutdown());
+        menu.Items.Add(Loc.T("Exit"), null, (_, _) => Shutdown());
 
         TrayMenuTheme.Apply(menu);
-
-        _tray = new System.Windows.Forms.NotifyIcon
-        {
-            Icon = LoadTrayIcon(),
-            Text = "DeskLauncher",
-            ContextMenuStrip = menu,
-            Visible = true,
-        };
-        _tray.DoubleClick += (_, _) => OpenFromTray();
+        return menu;
     }
 
     /// <summary>Opening the app from the tray always shows the splash first.</summary>

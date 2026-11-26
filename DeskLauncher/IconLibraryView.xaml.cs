@@ -34,7 +34,7 @@ public partial class IconLibraryView : UserControl
         var entries = AppState.Icons.List().Select(n => new Entry(n, AppState.Icons.GetByName(n))).ToList();
         IconGrid.ItemsSource = entries;
         EmptyText.Visibility = entries.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
-        CountText.Text = entries.Count == 1 ? "1 icono" : $"{entries.Count} iconos";
+        CountText.Text = entries.Count == 1 ? Loc.T("Icons1") : Loc.T("IconsN", entries.Count);
         Select(keep);
     }
 
@@ -51,7 +51,7 @@ public partial class IconLibraryView : UserControl
     {
         if (SelectedIcon is not { } name) return;
         var r = MessageBox.Show(Window.GetWindow(this),
-            "¿Quitar este icono de la biblioteca?\nLas carpetas y apps que lo usan volverán a su icono por defecto.",
+            Loc.T("ConfirmRemoveIcon"),
             "DeskLauncher", MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (r != MessageBoxResult.Yes) return;
         AppState.RemoveLibraryIcon(name);

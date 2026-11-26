@@ -62,6 +62,26 @@ public static class AppState
         SwitchProfile(p.Id);
     }
 
+    public static void RenameProfile(Profile p, string name)
+    {
+        p.Name = name;
+        SaveGlobal();
+    }
+
+    /// <summary>Deletes a profile and its data. The last profile cannot be deleted.</summary>
+    public static void DeleteProfile(Profile p)
+    {
+        if (Global.Profiles.Count <= 1) return;
+        bool wasActive = p.Id == Global.ActiveProfileId;
+        Global.Profiles.Remove(p);
+        if (wasActive) Global.ActiveProfileId = Global.Profiles[0].Id;
+        SaveGlobal();
+        Store.DeleteProfile(p.Id);
+        if (!wasActive) return;
+        LoadActive();
+        Rebuild?.Invoke();
+    }
+
     public static FolderConfig AddFolder(string name)
     {
         // Stagger new folders so they do not stack.

@@ -184,7 +184,7 @@ public static class LaunchService
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"No se pudo abrir '{s.Name}':\n{ex.Message}", "DeskLauncher");
+            MessageBox.Show(Loc.T("LaunchFailed", s.Name, ex.Message), "DeskLauncher");
         }
     }
 }

@@ -249,7 +249,7 @@ public partial class DockWindow : Window
 
     void Delete_Click(object sender, RoutedEventArgs e)
     {
-        if (MessageBox.Show($"¿Eliminar la carpeta '{_folder.Name}'?", "DeskLauncher",
+        if (MessageBox.Show(Loc.T("ConfirmDeleteFolder", _folder.Name), "DeskLauncher",
                 MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             AppState.RemoveFolder(_folder);
     }
