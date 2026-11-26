@@ -5,6 +5,8 @@ public static class PanelStyles
     public const string Arc = "Arc";
     public const string Ring = "Ring";
     public const string Phone = "Phone";
+    public const string Box = "Box";     // taskbar
+    public const string List = "List";   // taskbar
 }
 
 public sealed class GlobalConfig
@@ -51,6 +53,13 @@ public sealed class FolderConfig
 
     /// <summary>How this folder's apps are shown when opened: "Arc", "Ring" or "Phone". Null = Arc.</summary>
     public string? PanelStyle { get; set; }
+
+    /// <summary>Where the folder appears. At least one must be true.</summary>
+    public bool ShowOnDesktop { get; set; } = true;
+    public bool ShowOnTaskbar { get; set; }
+
+    /// <summary>Style when opened from the taskbar: "Box" or "List". Null = Box.</summary>
+    public string? TaskbarStyle { get; set; }
 
     public List<ShortcutItem> Shortcuts { get; set; } = new();
 }

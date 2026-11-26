@@ -109,6 +109,26 @@ public static class AppState
         FolderChanged?.Invoke(f);
     }
 
+    /// <summary>Sets where a folder appears. At least one place stays on (desktop wins if both are off).</summary>
+    public static void SetFolderLocation(FolderConfig f, bool desktop, bool taskbar)
+    {
+        if (!desktop && !taskbar) desktop = true;
+        if (f.ShowOnDesktop == desktop && f.ShowOnTaskbar == taskbar) return;
+        f.ShowOnDesktop = desktop;
+        f.ShowOnTaskbar = taskbar;
+        SaveProfile();
+        FolderChanged?.Invoke(f);
+    }
+
+    /// <summary>Sets the taskbar style ("Box" or "List"). Applies on next open.</summary>
+    public static void SetTaskbarStyle(FolderConfig f, string style)
+    {
+        if ((f.TaskbarStyle ?? PanelStyles.Box) == style) return;
+        f.TaskbarStyle = style;
+        SaveProfile();
+        FolderChanged?.Invoke(f);
+    }
+
     /// <summary>Sets how a folder shows its apps ("Arc", "Ring", "Phone"). Applies on next open.</summary>
     public static void SetFolderStyle(FolderConfig f, string style)
     {

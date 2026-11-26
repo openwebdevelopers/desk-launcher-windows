@@ -24,10 +24,13 @@ public sealed class ExpandedPanelWindow : Window
     bool _flipUp;
     double _canvasW, _canvasH, _cx, _cy;
 
-    public ExpandedPanelWindow(FolderConfig folder, POINT centerPx)
+    readonly string _style;
+
+    public ExpandedPanelWindow(FolderConfig folder, POINT centerPx, string? style = null)
     {
         _folder = folder;
         _center = centerPx;
+        _style = style ?? folder.PanelStyle ?? PanelStyles.Arc;
 
         WindowStyle = WindowStyle.None;
         AllowsTransparency = true;
@@ -87,10 +90,12 @@ public sealed class ExpandedPanelWindow : Window
         return g.DpiX / 96.0;
     }
 
-    UIElement BuildContent() => _folder.PanelStyle switch
+    UIElement BuildContent() => _style switch
     {
         PanelStyles.Ring => BuildRing(),
         PanelStyles.Phone => BuildPhone(),
+        PanelStyles.Box => BuildBox(),
+        PanelStyles.List => BuildList(),
         _ => BuildArc(),
     };
 
@@ -305,10 +310,17 @@ public sealed class ExpandedPanelWindow : Window
             Margin = new Thickness(2, 3, 2, 0),
         });
 
+        Wire(panel, s, new Point(0.5, 0.4));
+        return panel;
+    }
+
+    /// <summary>Intro zoom, hover zoom, click-to-launch and context menu for one app element.</summary>
+    void Wire(FrameworkElement panel, ShortcutItem s, Point origin)
+    {
         // Two independent scales: one for the load-in zoom, one for hover (so they never fight).
         var intro = new ScaleTransform(0.4, 0.4);
         var hover = new ScaleTransform(1, 1);
-        panel.RenderTransformOrigin = new Point(0.5, 0.4);
+        panel.RenderTransformOrigin = origin;
         panel.RenderTransform = new TransformGroup { Children = { intro, hover } };
         panel.Opacity = 0;
         _intro.Add((panel, intro));
@@ -345,7 +357,153 @@ public sealed class ExpandedPanelWindow : Window
         menu.Items.Add(reset);
         menu.Items.Add(remove);
         panel.ContextMenu = menu;
-        return panel;
+    }
+
+    // ---- Box (taskbar): rounded box with an app grid and a caret pointing at the taskbar icon ----
+
+    UIElement BuildBox()
+    {
+        var items = _folder.Shortcuts.OrderBy(s => s.SortOrder).ToList();
+        int cols = Math.Clamp(Math.Min(5, Math.Max(items.Count, 1)), 1, 8);
+
+        var stack = new StackPanel();
+        stack.Children.Add(new TextBlock
+        {
+            Text = _folder.Name,
+            Foreground = Brushes.White,
+            FontSize = 13,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Margin = new Thickness(0, 0, 0, 10),
+        });
+
+        if (items.Count == 0)
+        {
+            stack.Children.Add(new TextBlock
+            {
+                Text = "Arrastra apps al icono",
+                Foreground = Brushes.White,
+                Margin = new Thickness(24, 12, 24, 16),
+            });
+        }
+        else
+        {
+            var grid = new System.Windows.Controls.Primitives.UniformGrid { Columns = cols };
+            foreach (var s in items)
+            {
+                var tile = BuildTile(s);
+                tile.Margin = new Thickness(4);
+                grid.Children.Add(tile);
+            }
+            stack.Children.Add(grid);
+        }
+
+        var card = new Border
+        {
+            CornerRadius = new CornerRadius(14),
+            Padding = new Thickness(16, 12, 16, 12),
+            Background = ShellFill,
+            BorderBrush = ShellStroke,
+            BorderThickness = new Thickness(1),
+            Effect = ShellShadow(),
+            Child = stack,
+        };
+        var caret = new System.Windows.Shapes.Polygon
+        {
+            Points = new PointCollection { new Point(0, 0), new Point(20, 0), new Point(10, 10) },
+            Fill = ShellFill,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Margin = new Thickness(0, -1, 0, 0),
+        };
+        var root = new StackPanel { Margin = new Thickness(Pad) };
+        root.Children.Add(card);
+        root.Children.Add(caret);
+
+        root.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        _canvasW = root.DesiredSize.Width;
+        _canvasH = root.DesiredSize.Height;
+        _flipUp = true;
+        _cx = _canvasW / 2;
+        _cy = _canvasH - Pad + 26; // the taskbar icon center sits just under the caret tip
+        return root;
+    }
+
+    // ---- List (taskbar): labeled rows fanning up from the taskbar icon on a gentle curve ----
+
+    UIElement BuildList()
+    {
+        const double Step = 58, IconX = 250, IconSize = 46, LabelGap = 10;
+        var items = _folder.Shortcuts.OrderBy(s => s.SortOrder).ToList();
+        int n = items.Count;
+
+        double Shift(int i) => Math.Min(0.9 * i * i, 120);
+        double maxShift = n > 0 ? Shift(n - 1) : 0;
+
+        _canvasW = IconX + maxShift + IconSize / 2 + 2 * Pad;
+        _canvasH = Math.Max(n, 1) * Step + 2 * Pad + 10;
+        _flipUp = true;
+        _cx = IconX + Pad;
+        _cy = _canvasH - Pad - 10 - Step / 2 + 58; // first row center + distance down to the taskbar icon
+
+        var canvas = new Canvas { Width = _canvasW, Height = _canvasH };
+
+        if (n == 0)
+        {
+            var hint = new Border
+            {
+                Background = ShellFill,
+                CornerRadius = new CornerRadius(8),
+                Padding = new Thickness(12, 6, 12, 6),
+                Child = new TextBlock { Text = "Arrastra apps al icono", Foreground = Brushes.White },
+            };
+            Canvas.SetLeft(hint, _cx - 160);
+            Canvas.SetTop(hint, _canvasH - Pad - Step);
+            canvas.Children.Add(hint);
+            return canvas;
+        }
+
+        for (int i = 0; i < n; i++)
+        {
+            double iconCx = _cx + Shift(i);
+            double rowCy = _canvasH - Pad - 10 - Step / 2 - i * Step;
+
+            var label = new Border
+            {
+                Background = ShellFill,
+                BorderBrush = ShellStroke,
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(7),
+                Padding = new Thickness(10, 4, 10, 4),
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(0, 0, LabelGap, 0),
+                RenderTransformOrigin = new Point(0.5, 0.5),
+                RenderTransform = new RotateTransform(Math.Min(1.1 * i, 9)),
+                Child = new TextBlock
+                {
+                    Text = items[i].Name,
+                    Foreground = Brushes.White,
+                    FontSize = 13,
+                    MaxWidth = 190,
+                    TextTrimming = TextTrimming.CharacterEllipsis,
+                },
+            };
+            var icon = new Image { Source = AppState.Icons.GetApp(items[i]), Width = IconSize, Height = IconSize };
+            var row = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Background = Brushes.Transparent,
+                Cursor = Cursors.Hand,
+                ToolTip = items[i].TargetPath,
+            };
+            row.Children.Add(label);
+            row.Children.Add(icon);
+            Wire(row, items[i], new Point(0.9, 0.5));
+
+            row.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            Canvas.SetLeft(row, iconCx - (row.DesiredSize.Width - IconSize / 2));
+            Canvas.SetTop(row, rowCy - row.DesiredSize.Height / 2);
+            canvas.Children.Add(row);
+        }
+        return canvas;
     }
 
     void OnLoaded(object sender, RoutedEventArgs e)

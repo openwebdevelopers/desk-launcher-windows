@@ -29,7 +29,7 @@ public partial class App : Application
         AppState.Init();
         ThemeService.Apply();
         AppState.Rebuild += BuildDocks;
-        AppState.FolderChanged += f => _docks.FirstOrDefault(d => d.Folder == f)?.Refresh();
+        AppState.FolderChanged += OnFolderChanged;
 
         BuildDocks();
         BuildTray();
@@ -37,16 +37,61 @@ public partial class App : Application
 
     }
 
+    TaskbarStripWindow? _strip;
+
+    void OnFolderChanged(FolderConfig f)
+    {
+        // Desktop dock: add / remove / refresh according to the folder's locations.
+        var dock = _docks.FirstOrDefault(d => d.Folder == f);
+        if (f.ShowOnDesktop && dock == null)
+        {
+            var d = new DockWindow(f);
+            _docks.Add(d);
+            d.Show();
+            if (DockWindow.TakeSnapDirty()) AppState.SaveProfile();
+        }
+        else if (!f.ShowOnDesktop && dock != null)
+        {
+            dock.Close();
+            _docks.Remove(dock);
+        }
+        else dock?.Refresh();
+
+        SyncStrip();
+    }
+
+    /// <summary>Creates, updates or removes the taskbar strip from the folders that show on the taskbar.</summary>
+    void SyncStrip()
+    {
+        var folders = AppState.Profile.Folders.Where(x => x.ShowOnTaskbar).ToList();
+        if (folders.Count == 0)
+        {
+            _strip?.Close();
+            _strip = null;
+        }
+        else if (_strip == null)
+        {
+            _strip = new TaskbarStripWindow(folders);
+            _strip.Show();
+        }
+        else _strip.Refresh(folders);
+    }
+
     void BuildDocks()
     {
         foreach (var d in _docks) d.Close();
+        _strip?.Close();
+        _strip = null;
         _docks.Clear();
-        foreach (var f in AppState.Profile.Folders)
+        DockWindow.ResetClaims();
+        foreach (var f in AppState.Profile.Folders.Where(x => x.ShowOnDesktop))
         {
             var d = new DockWindow(f);
             _docks.Add(d);
             d.Show();
         }
+        if (DockWindow.TakeSnapDirty()) AppState.SaveProfile(); // docks were aligned to the desktop grid
+        SyncStrip();
     }
 
     void BuildTray()
@@ -108,6 +153,8 @@ public partial class App : Application
             _tray.Dispose();
         }
         foreach (var d in _docks) d.Close();
+        _strip?.Close();
+        _strip = null;
         _mutex?.Dispose();
     }
 }

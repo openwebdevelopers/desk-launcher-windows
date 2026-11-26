@@ -180,19 +180,40 @@
                                 </StackPanel>
                             </Grid>
 
-                            <DockPanel DockPanel.Dock="Top" Margin="4,0,0,16">
-                                <ComboBox x:Name="PanelStyleBox" DockPanel.Dock="Right" Width="150"
+                            <Grid DockPanel.Dock="Top" Margin="4,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.ColumnSpan="2" Margin="0,0,0,8">
+                                    <TextBlock Text="Ubicación y estilo" FontWeight="SemiBold"/>
+                                    <TextBlock Text="Dónde aparece la carpeta y cómo se muestran sus apps en cada lugar."
+                                               Style="{StaticResource Caption}" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+
+                                <CheckBox x:Name="DesktopChk" Grid.Row="1" Content="Escritorio" VerticalAlignment="Center"
+                                          Click="Location_Click"/>
+                                <ComboBox x:Name="PanelStyleBox" Grid.Row="1" Grid.Column="1" Width="150" Margin="0,0,0,6"
                                           SelectionChanged="PanelStyle_Changed">
                                     <ComboBoxItem Tag="Arc" Content="Arco"/>
                                     <ComboBoxItem Tag="Ring" Content="Anillo"/>
                                     <ComboBoxItem Tag="Phone" Content="Phone App"/>
                                 </ComboBox>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Estilo de accesos" FontWeight="SemiBold"/>
-                                    <TextBlock Text="Cómo se muestran las apps de esta carpeta."
-                                               Style="{StaticResource Caption}" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"/>
-                                </StackPanel>
-                            </DockPanel>
+
+                                <CheckBox x:Name="TaskbarChk" Grid.Row="2" Content="Barra de tareas" VerticalAlignment="Center"
+                                          Click="Location_Click"/>
+                                <ComboBox x:Name="TaskbarStyleBox" Grid.Row="2" Grid.Column="1" Width="150"
+                                          SelectionChanged="TaskbarStyle_Changed">
+                                    <ComboBoxItem Tag="Box" Content="Caja"/>
+                                    <ComboBoxItem Tag="List" Content="Lista"/>
+                                </ComboBox>
+                            </Grid>
 
                             <DockPanel DockPanel.Dock="Top" Margin="4,0,0,8">
                                 <TextBlock Text="APLICACIONES VINCULADAS" Style="{StaticResource SectionLabel}"

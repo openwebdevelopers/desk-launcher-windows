@@ -99,7 +99,13 @@ public partial class ManagerWindow : Window
         _loading = true; // reflect the folder's style without writing it back
         PanelStyleBox.SelectedItem = PanelStyleBox.Items.OfType<ComboBoxItem>()
             .FirstOrDefault(i => (string?)i.Tag == (f?.PanelStyle ?? PanelStyles.Arc));
-        PanelStyleBox.IsEnabled = f != null;
+        TaskbarStyleBox.SelectedItem = TaskbarStyleBox.Items.OfType<ComboBoxItem>()
+            .FirstOrDefault(i => (string?)i.Tag == (f?.TaskbarStyle ?? PanelStyles.Box));
+        DesktopChk.IsChecked = f?.ShowOnDesktop ?? false;
+        TaskbarChk.IsChecked = f?.ShowOnTaskbar ?? false;
+        DesktopChk.IsEnabled = TaskbarChk.IsEnabled = f != null;
+        PanelStyleBox.IsEnabled = f != null && f.ShowOnDesktop;
+        TaskbarStyleBox.IsEnabled = f != null && f.ShowOnTaskbar;
         _loading = wasLoading;
         var keep = AppList.SelectedItem is ShortcutItem sel ? sel.Id : null;
         AppList.ItemsSource = null;
@@ -301,6 +307,20 @@ public partial class ManagerWindow : Window
         for (int i = 0; i < VisualTreeHelper.GetChildrenCount(d); i++)
             if (FindScrollViewer(VisualTreeHelper.GetChild(d, i)) is { } r) return r;
         return null;
+    }
+
+    void Location_Click(object sender, RoutedEventArgs e)
+    {
+        if (SelectedFolder is not { } f) return;
+        AppState.SetFolderLocation(f, DesktopChk.IsChecked == true, TaskbarChk.IsChecked == true);
+        ShowFolder(f); // re-sync checkboxes (at least one place always stays on) and enabled combos
+    }
+
+    void TaskbarStyle_Changed(object sender, SelectionChangedEventArgs e)
+    {
+        if (_loading || SelectedFolder is not { } f ||
+            TaskbarStyleBox.SelectedItem is not ComboBoxItem { Tag: string style }) return;
+        AppState.SetTaskbarStyle(f, style);
     }
 
     void PanelStyle_Changed(object sender, SelectionChangedEventArgs e)

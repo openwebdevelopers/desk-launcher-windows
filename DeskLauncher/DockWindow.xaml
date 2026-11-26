@@ -13,6 +13,8 @@
                     <MenuItem x:Name="StyleRing" Header="Anillo" Tag="Ring" IsCheckable="True" Click="Style_Click"/>
                     <MenuItem x:Name="StylePhone" Header="Phone App" Tag="Phone" IsCheckable="True" Click="Style_Click"/>
                 </MenuItem>
+                <MenuItem x:Name="TaskbarToggle" Header="Mostrar también en la barra de tareas" IsCheckable="True"
+                          Click="TaskbarToggle_Click"/>
                 <MenuItem Header="Cambiar icono…" Click="ChangeIcon_Click"/>
                 <MenuItem Header="Restablecer icono" Click="ResetIcon_Click"/>
                 <MenuItem Header="Eliminar carpeta" Click="Delete_Click"/>

@@ -44,6 +44,10 @@ Las capturas usan una configuración de demostración (carpetas y apps genérica
   - **Arco**: banda en arco alrededor del icono.
   - **Anillo**: círculo completo con el logo del launcher al centro. Si el icono está cerca de un borde de pantalla, el anillo se desplaza para entrar completo.
   - **Phone App**: rectángulo de esquinas redondeadas con cuadrícula de apps (usa `MaxGridColumns` del perfil).
+- **Ubicación por carpeta**: cada carpeta puede mostrarse en el **Escritorio**, en la **Barra de tareas** o en ambos lugares, con un estilo independiente para cada uno (Manager > carpeta > *Ubicación y estilo*).
+  - Estilos de la barra de tareas: **Caja** (cuadrícula de apps con una flecha hacia el icono) y **Lista** (filas con etiqueta que suben en curva desde el icono).
+  - Los iconos de la barra de tareas se colocan sobre la barra, a la izquierda de la bandeja del sistema (Windows no permite agregar elementos a la barra de tareas).
+- **Alineación al escritorio**: las carpetas del escritorio se ajustan a la cuadrícula real de iconos de Windows y, al arrastrar, se ve una sombra con la posición de destino.
 - **Animaciones**: zoom suave de los iconos al abrir el panel y aumento suave al pasar el mouse.
 - **Perfiles**: conjuntos independientes de carpetas; se cambian desde el Manager o el menú de la bandeja.
 - **Iconos personalizados**: cada carpeta y cada app puede usar un icono propio, elegido de una biblioteca central de iconos (agregar y quitar desde *Configuración*, o desde el modal que abre *Cambiar icono*). Acepta `.png .jpg .jpeg .bmp .ico .gif` y extrae iconos de `.exe .dll .lnk`.

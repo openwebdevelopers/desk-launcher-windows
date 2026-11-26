@@ -37,7 +37,7 @@ public partial class DockWindow : Window
             _timer.Tick += (_, _) => DesktopHost.EnsureAttached(_hwnd);
             _timer.Start();
         };
-        Closed += (_, _) => _timer?.Stop();
+        Closed += (_, _) => { _timer?.Stop(); CloseGhost(); };
 
         Root.MouseLeftButtonDown += OnDown;
         Root.MouseMove += OnMove;
@@ -62,8 +62,69 @@ public partial class DockWindow : Window
     void Reposition()
     {
         double scale = VisualTreeHelper.GetDpi(this).DpiScaleX;
+        int w = (int)(Width * scale), h = (int)(Height * scale);
         var (x, y) = MonitorService.Resolve(_folder);
-        DesktopHost.MoveScreen(_hwnd, x, y, (int)(Width * scale), (int)(Height * scale));
+
+        // Align to the real desktop icon grid (free slot nearest to the saved position).
+        var (pos, cell) = Snap(DesktopGrid.Get(), x + w / 2, y + h / 2, w, h);
+        Claims[_folder.Id] = cell;
+        DesktopHost.MoveScreen(_hwnd, pos.X, pos.Y, w, h);
+
+        // Persist the aligned position, but never overwrite one whose monitor is currently missing.
+        bool monitorKnown = string.IsNullOrEmpty(_folder.MonitorDeviceName)
+                            || MonitorService.ByName(_folder.MonitorDeviceName) != null;
+        if (monitorKnown && (pos.X != x || pos.Y != y))
+        {
+            MonitorService.Store(_folder, pos.X, pos.Y, w, h);
+            _snapDirty = true;
+        }
+    }
+
+    // ---- snapping to the real desktop icon grid ----
+
+    static readonly Dictionary<string, DesktopGrid.Cell> Claims = new();
+    static bool _snapDirty;
+
+    /// <summary>Forget claimed grid cells (call before rebuilding all docks).</summary>
+    public static void ResetClaims() => Claims.Clear();
+
+    /// <summary>True once if loading moved any dock onto the grid; the caller then saves the profile.</summary>
+    public static bool TakeSnapDirty() { var d = _snapDirty; _snapDirty = false; return d; }
+
+    DesktopGrid.Info _grid;
+    DragGhostWindow? _ghost;
+    (int X, int Y) _snapPos;
+    DesktopGrid.Cell _snapCell;
+
+    /// <summary>Nearest free grid slot for a dock window whose center is (cx, cy).</summary>
+    ((int X, int Y) Pos, DesktopGrid.Cell Cell) Snap(DesktopGrid.Info g, int cx, int cy, int w, int h)
+    {
+        var wa = MonitorService.FromPoint(cx, cy).WorkingArea;
+        var taken = Claims.Where(kv => kv.Key != _folder.Id).Select(kv => kv.Value).ToHashSet();
+        var cell = DesktopGrid.Nearest(g, cx, cy, w, h, wa, taken);
+        return (DesktopGrid.WindowPos(g, cell, w, h), cell);
+    }
+
+    void UpdateGhost(int dx, int dy)
+    {
+        int w = _startRect.Right - _startRect.Left, h = _startRect.Bottom - _startRect.Top;
+        int x = _startRect.Left + dx, y = _startRect.Top + dy;
+        var (pos, cell) = Snap(_grid, x + w / 2, y + h / 2, w, h);
+        _snapPos = pos;
+        _snapCell = cell;
+        if (_ghost == null)
+        {
+            _ghost = new DragGhostWindow(pos.X, pos.Y, w, h);
+            _ghost.Show();
+        }
+        else _ghost.MoveTo(pos.X, pos.Y, w, h);
+        DesktopHost.Reinsert(_hwnd); // keep the dragged icon above its shadow
+    }
+
+    void CloseGhost()
+    {
+        _ghost?.Close();
+        _ghost = null;
     }
 
     // ---- drag to move / click to expand ----
@@ -74,6 +135,7 @@ public partial class DockWindow : Window
         _dragging = false;
         GetCursorPos(out _startCursor);
         GetWindowRect(_hwnd, out _startRect);
+        _grid = DesktopGrid.Get();
         Root.CaptureMouse();
     }
 
@@ -91,6 +153,7 @@ public partial class DockWindow : Window
         {
             DesktopHost.MoveScreen(_hwnd, _startRect.Left + dx, _startRect.Top + dy,
                 _startRect.Right - _startRect.Left, _startRect.Bottom - _startRect.Top);
+            UpdateGhost(dx, dy);
         }
     }
 
@@ -102,8 +165,18 @@ public partial class DockWindow : Window
 
         if (_dragging)
         {
-            GetWindowRect(_hwnd, out var r);
-            MonitorService.Store(_folder, r.Left, r.Top, r.Right - r.Left, r.Bottom - r.Top);
+            // Drop onto the slot shown by the shadow.
+            int w = _startRect.Right - _startRect.Left, h = _startRect.Bottom - _startRect.Top;
+            // Recompute from the real cursor: the last mouse-move event can lag behind the release.
+            GetCursorPos(out var cur);
+            var (pos, cell) = Snap(_grid, _startRect.Left + (cur.X - _startCursor.X) + w / 2,
+                                   _startRect.Top + (cur.Y - _startCursor.Y) + h / 2, w, h);
+            _snapPos = pos;
+            _snapCell = cell;
+            CloseGhost();
+            DesktopHost.MoveScreen(_hwnd, _snapPos.X, _snapPos.Y, w, h);
+            Claims[_folder.Id] = _snapCell;
+            MonitorService.Store(_folder, _snapPos.X, _snapPos.Y, w, h);
             AppState.SaveProfile();
             _dragging = false;
             return;
@@ -121,7 +194,7 @@ public partial class DockWindow : Window
 
         FrameworkElement g = CustomGlyph.Visibility == Visibility.Visible ? CustomGlyph : Glyph;
         var c = g.PointToScreen(new Point(g.ActualWidth / 2, g.ActualHeight / 2));
-        _panel = new ExpandedPanelWindow(_folder, new POINT { X = (int)c.X, Y = (int)c.Y });
+        _panel = new ExpandedPanelWindow(_folder, new POINT { X = (int)c.X, Y = (int)c.Y }, _folder.PanelStyle);
         _panel.Closed += (_, _) =>
         {
             _panel = null;
@@ -155,7 +228,11 @@ public partial class DockWindow : Window
         StyleArc.IsChecked = s == PanelStyles.Arc;
         StyleRing.IsChecked = s == PanelStyles.Ring;
         StylePhone.IsChecked = s == PanelStyles.Phone;
+        TaskbarToggle.IsChecked = _folder.ShowOnTaskbar;
     }
+
+    void TaskbarToggle_Click(object sender, RoutedEventArgs e) =>
+        AppState.SetFolderLocation(_folder, true, TaskbarToggle.IsChecked);
 
     void Style_Click(object sender, RoutedEventArgs e)
     {
