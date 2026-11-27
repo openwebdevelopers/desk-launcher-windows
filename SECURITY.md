@@ -17,5 +17,5 @@ Abre un [aviso de seguridad privado](https://github.com/openwebdevelopers/desk-l
 El ejecutable no está firmado. Compara el SHA-256 del `.zip` con el que GitHub muestra como *Digest* junto a cada archivo en la página de cada [release](https://github.com/openwebdevelopers/desk-launcher-windows/releases):
 
 ```powershell
-Get-FileHash .\DeskLauncher-1.0.0-win-x64.zip -Algorithm SHA256
+Get-FileHash .\DeskLauncher-1.0.1-win-x64.zip -Algorithm SHA256
 ```
