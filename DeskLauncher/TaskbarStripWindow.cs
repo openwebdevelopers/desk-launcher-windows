@@ -25,6 +25,7 @@ public sealed class TaskbarStripWindow : Window
     readonly StackPanel _row = new() { Orientation = Orientation.Horizontal, Background = HitBg };
     readonly DispatcherTimer _timer;
     IntPtr _hwnd;
+    bool _hiddenForFullScreen;
     ExpandedPanelWindow? _panel;
     FolderConfig? _panelFolder;
     DateTime _panelClosedAt = DateTime.MinValue;
@@ -198,6 +199,23 @@ public sealed class TaskbarStripWindow : Window
     void Reposition()
     {
         if (_hwnd == IntPtr.Zero || !IsLoaded) return;
+
+        // A full-screen app (video, game, presentation) hides the taskbar: stay out of its way.
+        bool fullScreen = SHQueryUserNotificationState(out var qs) == 0 && qs is 2 or 3 or 4;
+        if (fullScreen)
+        {
+            if (_hiddenForFullScreen) return;
+            _hiddenForFullScreen = true;
+            _panel?.Dismiss();
+            ShowWindow(_hwnd, 0); // SW_HIDE
+            return;
+        }
+        if (_hiddenForFullScreen)
+        {
+            _hiddenForFullScreen = false;
+            ShowWindow(_hwnd, 4); // SW_SHOWNOACTIVATE
+        }
+
         double scale = VisualTreeHelper.GetDpi(this).DpiScaleX;
         int w = (int)Math.Ceiling(ActualWidth * scale);
 

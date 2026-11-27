@@ -56,6 +56,13 @@ public static class NativeMethods
     public static extern bool SetWindowPos(IntPtr hWnd, IntPtr after, int x, int y, int cx, int cy, uint flags);
 
     [DllImport("user32.dll")]
+    public static extern bool ShowWindow(IntPtr hWnd, int cmd);
+
+    /// <summary>QUERY_USER_NOTIFICATION_STATE: 2 = busy (full-screen app), 3 = D3D full screen, 4 = presentation.</summary>
+    [DllImport("shell32.dll")]
+    public static extern int SHQueryUserNotificationState(out int state);
+
+    [DllImport("user32.dll")]
     public static extern bool GetWindowRect(IntPtr hWnd, out RECT rect);
 
     [DllImport("user32.dll")]
