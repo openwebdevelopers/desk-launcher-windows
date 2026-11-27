@@ -7,12 +7,12 @@ Lanzador de accesos para el escritorio de Windows. Coloca carpetas flotantes sob
 
 ## Descarga
 
-Última versión: **[1.0.1](https://github.com/openwebdevelopers/desk-launcher-windows/releases/tag/v1.0.1)** (versión estable).
+Última versión: **[1.1.0](https://github.com/openwebdevelopers/desk-launcher-windows/releases/tag/v1.1.0)** (versión estable).
 
 | Archivo | Descripción |
 |---|---|
-| [`DeskLauncher-1.0.1-win-x64.zip`](https://github.com/openwebdevelopers/desk-launcher-windows/releases/download/v1.0.1/DeskLauncher-1.0.1-win-x64.zip) | Recomendado. Un solo `.exe`, no requiere instalar nada: descomprime y ejecuta. |
-| [`DeskLauncher-1.0.1-win-x64-requiere-dotnet10.zip`](https://github.com/openwebdevelopers/desk-launcher-windows/releases/download/v1.0.1/DeskLauncher-1.0.1-win-x64-requiere-dotnet10.zip) | Versión liviana (0,3 MB); requiere el [runtime .NET 10 Desktop](https://dotnet.microsoft.com/download/dotnet/10.0). |
+| [`DeskLauncher-1.1.0-win-x64.zip`](https://github.com/openwebdevelopers/desk-launcher-windows/releases/download/v1.1.0/DeskLauncher-1.1.0-win-x64.zip) | Recomendado. Un solo `.exe`, no requiere instalar nada: descomprime y ejecuta. |
+| [`DeskLauncher-1.1.0-win-x64-requiere-dotnet10.zip`](https://github.com/openwebdevelopers/desk-launcher-windows/releases/download/v1.1.0/DeskLauncher-1.1.0-win-x64-requiere-dotnet10.zip) | Versión liviana (0,3 MB); requiere el [runtime .NET 10 Desktop](https://dotnet.microsoft.com/download/dotnet/10.0). |
 
 Windows 10/11 de 64 bits. El ejecutable no está firmado, por lo que SmartScreen puede mostrar una advertencia. Todas las versiones están en [Releases](https://github.com/openwebdevelopers/desk-launcher-windows/releases).
 
@@ -58,7 +58,7 @@ Las capturas usan una configuración de demostración (carpetas y apps genérica
   - **Phone App**: rectángulo de esquinas redondeadas con cuadrícula de apps (usa `MaxGridColumns` del perfil).
 - **Ubicación por carpeta**: cada carpeta puede mostrarse en el **Escritorio**, en la **Barra de tareas** o en ambos lugares, con un estilo independiente para cada uno (Manager > carpeta > *Ubicación y estilo*).
   - Estilos de la barra de tareas: **Caja** (cuadrícula de apps con una flecha hacia el icono) y **Lista** (filas con etiqueta que suben en curva desde el icono).
-  - Los iconos de la barra de tareas se colocan sobre la barra, a la izquierda de la bandeja del sistema (Windows no permite agregar elementos a la barra de tareas).
+  - Los iconos de la barra de tareas se colocan sobre la barra, **después de las apps** por defecto. En *Configuración > Ubicación en la barra de tareas* (con un esquema de cada opción) puedes elegir entre después de las apps o junto a la bandeja. Windows no permite agregar elementos a la barra de tareas.
   - Con una app en pantalla completa (video, juego, presentación) los iconos se ocultan solos y vuelven al salir.
 - **Alineación al escritorio**: las carpetas del escritorio se ajustan a la cuadrícula real de iconos de Windows y, al arrastrar, se ve una sombra con la posición de destino.
 - **Animaciones**: zoom suave de los iconos al abrir el panel y aumento suave al pasar el mouse.

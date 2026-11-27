@@ -9,6 +9,15 @@ public static class PanelStyles
     public const string List = "List";   // taskbar
 }
 
+public static class TaskbarPositions
+{
+    public const string AfterApps = "AfterApps";   // right of the last app button
+    public const string Tray = "Tray";             // left of the system tray
+
+    /// <summary>Any value other than "Tray" (including old "Start"/"BeforeApps" settings) means after the apps.</summary>
+    public static string Normalize(string? v) => v == Tray ? Tray : AfterApps;
+}
+
 public sealed class GlobalConfig
 {
     public int SchemaVersion { get; set; } = 1;
@@ -17,6 +26,8 @@ public sealed class GlobalConfig
     public string Theme { get; set; } = "System";
     /// <summary>"System" (Windows language, English fallback), "en" or "es".</summary>
     public string Language { get; set; } = "System";
+    /// <summary>Where the taskbar strip sits: "AfterApps" (default) or "Tray".</summary>
+    public string TaskbarPosition { get; set; } = TaskbarPositions.AfterApps;
     public string ActiveProfileId { get; set; } = "";
     public List<Profile> Profiles { get; set; } = new();
 }

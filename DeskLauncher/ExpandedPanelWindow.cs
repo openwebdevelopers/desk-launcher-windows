@@ -62,7 +62,15 @@ public sealed class ExpandedPanelWindow : Window
     {
         if (_closing) return;
         _closing = true;
-        Close();
+        if (!IsLoaded) { Close(); return; }
+        PlayOutro(() => { if (!_closedDone) Close(); });
+    }
+
+    bool _closedDone;
+    protected override void OnClosed(EventArgs e)
+    {
+        _closedDone = true;
+        base.OnClosed(e);
     }
 
     protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
@@ -539,6 +547,40 @@ public sealed class ExpandedPanelWindow : Window
         };
         t.BeginAnimation(ScaleTransform.ScaleXProperty, a);
         t.BeginAnimation(ScaleTransform.ScaleYProperty, a);
+    }
+
+    /// <summary>
+    /// Reverse of <see cref="PlayIntro"/>: tiles shrink + fade out, last one first, then the whole
+    /// window fades; <paramref name="done"/> runs when it is gone.
+    /// </summary>
+    void PlayOutro(Action done)
+    {
+        var ease = new System.Windows.Media.Animation.CubicEase
+        { EasingMode = System.Windows.Media.Animation.EasingMode.EaseIn };
+        var dur = TimeSpan.FromMilliseconds(200);
+        const int fadeMs = 140;
+        double lastBegin = 0;
+
+        for (int i = 0; i < _intro.Count; i++)
+        {
+            var (tile, scale) = _intro[i];
+            double beginMs = Math.Min((_intro.Count - 1 - i) * 22, 220); // last tile leaves first
+            lastBegin = Math.Max(lastBegin, beginMs);
+            var begin = TimeSpan.FromMilliseconds(beginMs);
+
+            var zoom = new System.Windows.Media.Animation.DoubleAnimation(0.4, dur)
+            { BeginTime = begin, EasingFunction = ease, FillBehavior = System.Windows.Media.Animation.FillBehavior.HoldEnd };
+            scale.BeginAnimation(ScaleTransform.ScaleXProperty, zoom);
+            scale.BeginAnimation(ScaleTransform.ScaleYProperty, zoom);
+
+            tile.BeginAnimation(OpacityProperty,
+                new System.Windows.Media.Animation.DoubleAnimation(0, dur) { BeginTime = begin, EasingFunction = ease });
+        }
+
+        var fade = new System.Windows.Media.Animation.DoubleAnimation(0, TimeSpan.FromMilliseconds(fadeMs))
+        { BeginTime = TimeSpan.FromMilliseconds(lastBegin + 200 - fadeMs) };
+        fade.Completed += (_, _) => done();
+        BeginAnimation(OpacityProperty, fade);
     }
 
     /// <summary>Tiles zoom + fade in one after another (short stagger so it feels smooth, not slow).</summary>

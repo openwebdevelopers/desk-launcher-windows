@@ -200,13 +200,14 @@ public partial class DockWindow : Window
 
         FrameworkElement g = CustomGlyph.Visibility == Visibility.Visible ? CustomGlyph : Glyph;
         var c = g.PointToScreen(new Point(g.ActualWidth / 2, g.ActualHeight / 2));
-        _panel = new ExpandedPanelWindow(_folder, new POINT { X = (int)c.X, Y = (int)c.Y }, _folder.PanelStyle);
-        _panel.Closed += (_, _) =>
+        var panel = new ExpandedPanelWindow(_folder, new POINT { X = (int)c.X, Y = (int)c.Y }, _folder.PanelStyle);
+        _panel = panel;
+        panel.Closed += (_, _) =>
         {
-            _panel = null;
             _panelClosedAt = DateTime.UtcNow;
+            if (_panel == panel) _panel = null;
         };
-        _panel.Show();
+        panel.Show();
     }
 
     void ClosePanel() => _panel?.Dismiss();

@@ -27,6 +27,7 @@ public partial class ManagerWindow : Window
     ManagerWindow()
     {
         InitializeComponent();
+        BuildPositionOptions();
         AppState.Rebuild += LoadAll;
         AppState.FolderChanged += OnFolderChanged;
         Closed += (_, _) =>
@@ -51,6 +52,8 @@ public partial class ManagerWindow : Window
         AutoStartBox.IsChecked = AppState.Global.StartOnLogin;
         ThemeBox.SelectedItem = ThemeBox.Items.OfType<ComboBoxItem>()
             .FirstOrDefault(i => (string?)i.Tag == AppState.Global.Theme) ?? ThemeBox.Items[0];
+        foreach (RadioButton rb in PosPanel.Children)
+            rb.IsChecked = (string?)rb.Tag == TaskbarPositions.Normalize(AppState.Global.TaskbarPosition);
         LangBox.SelectedItem = LangBox.Items.OfType<ComboBoxItem>()
             .FirstOrDefault(i => (string?)i.Tag == AppState.Global.Language) ?? LangBox.Items[0];
         _loading = false;
@@ -358,6 +361,58 @@ public partial class ManagerWindow : Window
         AppState.Global.Theme = mode;
         AppState.SaveGlobal();
         ThemeService.Apply();
+    }
+
+    // ---- taskbar location picker: radio cards with a mini taskbar sketch ----
+
+    static readonly (string Tag, string Key, double X)[] PosOptions =
+    {
+        (TaskbarPositions.AfterApps, "PosAfterApps", 196),
+        (TaskbarPositions.Tray, "PosTray", 226),
+    };
+
+    void BuildPositionOptions()
+    {
+        foreach (var (tag, key, x) in PosOptions)
+        {
+            var label = new TextBlock { Text = Loc.T(key), Margin = new Thickness(0, 0, 0, 6), TextWrapping = TextWrapping.Wrap };
+            label.SetResourceReference(TextBlock.ForegroundProperty, "TextPrimary");
+            var sp = new StackPanel { Margin = new Thickness(2, 2, 14, 2) };
+            sp.Children.Add(label);
+            sp.Children.Add(MiniTaskbar(x));
+            var rb = new RadioButton { GroupName = "TbPos", Tag = tag, Content = sp, Margin = new Thickness(0, 0, 8, 12), MinWidth = 330 };
+            rb.Checked += (_, _) =>
+            {
+                if (_loading || rb.Tag is not string pos || pos == TaskbarPositions.Normalize(AppState.Global.TaskbarPosition)) return;
+                AppState.Global.TaskbarPosition = pos;
+                AppState.SaveGlobal(); // the strip re-reads it on its next 500 ms tick
+            };
+            PosPanel.Children.Add(rb);
+        }
+    }
+
+    /// <summary>Tiny taskbar sketch: Start, Task View, three apps, tray, and the folder strip (accent) at stripX.</summary>
+    static Border MiniTaskbar(double stripX)
+    {
+        var canvas = new Canvas { Width = 300, Height = 26 };
+        void Box(double x, double w, string brushKey, double radius = 3)
+        {
+            var r = new System.Windows.Shapes.Rectangle { Width = w, Height = 14, RadiusX = radius, RadiusY = radius };
+            r.SetResourceReference(System.Windows.Shapes.Shape.FillProperty, brushKey);
+            Canvas.SetLeft(r, x); Canvas.SetTop(r, 6); canvas.Children.Add(r);
+        }
+        Box(100, 14, "TextSecondary");   // Start
+        Box(118, 14, "TextTertiary");    // Task View
+        foreach (var ax in new[] { 138.0, 158.0, 178.0 }) Box(ax, 14, "TextTertiary"); // apps
+        Box(264, 30, "TextTertiary", 2); // tray
+        Box(stripX, 26, "Accent", 4);    // folder strip
+        var bar = new Border
+        {
+            Child = canvas, CornerRadius = new CornerRadius(4), Width = 300, Height = 26,
+            HorizontalAlignment = HorizontalAlignment.Left,
+        };
+        bar.SetResourceReference(Border.BackgroundProperty, "TileBg");
+        return bar;
     }
 
     void Lang_Changed(object sender, SelectionChangedEventArgs e)

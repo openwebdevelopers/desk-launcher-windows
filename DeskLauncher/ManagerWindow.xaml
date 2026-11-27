@@ -361,11 +361,8 @@
                     <TextBlock Text="{local:Tr SettingsDesc}"
                                Foreground="{DynamicResource TextSecondary}" Margin="0,4,0,0"/>
                 </StackPanel>
-                <Grid Grid.Row="1">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
                     <Border Style="{StaticResource Card}" Margin="0,0,0,16">
                         <StackPanel>
                             <DockPanel Margin="0,0,0,14">
@@ -397,7 +394,15 @@
                             <CheckBox x:Name="AutoStartBox" Content="{local:Tr AutoStart}" Click="AutoStart_Click"/>
                         </StackPanel>
                     </Border>
-                    <Border Grid.Row="1" Style="{StaticResource Card}" VerticalAlignment="Top">
+                    <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                        <StackPanel>
+                            <TextBlock Text="{local:Tr TaskbarPosition}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{local:Tr TaskbarPositionDesc}"
+                                       Style="{StaticResource Caption}" Margin="0,2,0,12" TextWrapping="Wrap"/>
+                            <WrapPanel x:Name="PosPanel"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Card}" VerticalAlignment="Top">
                         <DockPanel>
                             <Button DockPanel.Dock="Right" VerticalAlignment="Center" Click="OpenLibrary_Click"
                                     ToolTip="{local:Tr OpenLibrary}">
@@ -412,7 +417,8 @@
                             </StackPanel>
                         </DockPanel>
                     </Border>
-                </Grid>
+                </StackPanel>
+                </ScrollViewer>
             </Grid>
         </Grid>
     </Grid>

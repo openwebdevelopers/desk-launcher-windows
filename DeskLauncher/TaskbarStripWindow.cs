@@ -23,7 +23,7 @@ public sealed class TaskbarStripWindow : Window
     // Alpha 1, not 0: a fully transparent pixel of a layered window lets clicks fall through to the taskbar.
     static readonly Brush HitBg = new SolidColorBrush(Color.FromArgb(1, 0, 0, 0));
     readonly StackPanel _row = new() { Orientation = Orientation.Horizontal, Background = HitBg };
-    readonly DispatcherTimer _timer;
+    readonly DispatcherTimer _timer, _raiseTimer;
     IntPtr _hwnd;
     bool _hiddenForFullScreen;
     ExpandedPanelWindow? _panel;
@@ -57,7 +57,17 @@ public sealed class TaskbarStripWindow : Window
         _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
         _timer.Tick += (_, _) => Reposition();
         _timer.Start();
-        Closed += (_, _) => { _timer.Stop(); _panel?.Dismiss(); };
+
+        // Clicking the taskbar raises it over the strip; the 500 ms Reposition would leave the icons
+        // hidden until the next tick. A cheap z-order-only re-raise closes that gap.
+        _raiseTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(40) };
+        _raiseTimer.Tick += (_, _) =>
+        {
+            if (_hwnd == IntPtr.Zero || _hiddenForFullScreen || !IsVisible) return;
+            SetWindowPos(_hwnd, HWND_TOPMOST_, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+        };
+        _raiseTimer.Start();
+        Closed += (_, _) => { _timer.Stop(); _raiseTimer.Stop(); _panel?.Dismiss(); };
     }
 
     /// <summary>Rebuilds the icons (names, icons, list of folders) after a change.</summary>
@@ -184,17 +194,31 @@ public sealed class TaskbarStripWindow : Window
 
         var c = anchor.PointToScreen(new Point(anchor.ActualWidth / 2, anchor.ActualHeight / 2));
         _panelFolder = f;
-        _panel = new ExpandedPanelWindow(f, new POINT { X = (int)c.X, Y = (int)c.Y }, f.TaskbarStyle ?? PanelStyles.Box);
-        _panel.Closed += (_, _) =>
+        var panel = new ExpandedPanelWindow(f, new POINT { X = (int)c.X, Y = (int)c.Y }, f.TaskbarStyle ?? PanelStyles.Box);
+        _panel = panel;
+        panel.Closed += (_, _) =>
         {
+            _panelClosedAt = DateTime.UtcNow;
+            if (_panel != panel) return; // a newer panel opened while this one was animating out
             _panel = null;
             _panelFolder = null;
-            _panelClosedAt = DateTime.UtcNow;
         };
-        _panel.Show();
+        panel.Show();
     }
 
     // ---- placement over the taskbar ----
+
+    /// <summary>
+    /// X right after the last app button, or int.MinValue to use the tray placement (setting "Tray",
+    /// buttons not found, or no room before the tray at <paramref name="limit"/>).
+    /// </summary>
+    static int PlaceAfterApps(string pos, int w, int limit)
+    {
+        if (TaskbarPositions.Normalize(pos) != TaskbarPositions.AfterApps) return int.MinValue;
+        if (!TaskbarLocator.TryGetButtonsRight(out var right)) return int.MinValue;
+        int x = right + 8;
+        return x + w <= limit ? x : int.MinValue;
+    }
 
     void Reposition()
     {
@@ -233,6 +257,9 @@ public sealed class TaskbarStripWindow : Window
                 if (notify != IntPtr.Zero && GetWindowRect(notify, out var nr) && nr.Right > nr.Left)
                     right = nr.Left;
                 x = right - w - 8;
+
+                int px = PlaceAfterApps(AppState.Global.TaskbarPosition, w, right);
+                if (px != int.MinValue) x = px;
             }
             else
             {
